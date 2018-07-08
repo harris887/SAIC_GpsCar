@@ -1,0 +1,29 @@
+#ifndef _BUTTON_H_
+#define _BUTTON_H_
+
+#define BARRIER_SENSOR_MASK         0x01
+
+#define BUTTON_TOUCH_F_PIN          GPIO_Pin_12
+#define BUTTON_TOUCH_B_PIN          GPIO_Pin_13
+#define BUTTON_TOUCH_PORT           GPIOB
+
+#define BUTTON_IMM_STOP_PIN       GPIO_Pin_9
+#define BUTTON_IMM_STOP_PORT      GPIOE
+
+#define GET_BUTTON_IMM_STOP_STATUS()      BUTTON_IMM_STOP_PORT->IDR&BUTTON_IMM_STOP_PIN
+#define GET_BUTTON_TOUCH_F_STATUS()      BUTTON_TOUCH_PORT->IDR&BUTTON_TOUCH_F_PIN
+#define GET_BUTTON_TOUCH_B_STATUS()      BUTTON_TOUCH_PORT->IDR&BUTTON_TOUCH_B_PIN
+
+extern u8 BUTTON_IM_STOP_Flag;
+extern u8 BUTTON_FOLLOW_LINE_AND_PROGRAM_Flag;
+extern u8 BARRIER_Flag;
+
+void BUTTON_Init(void);
+void CHECK_BUTTON_TASK(void);
+
+
+
+
+
+
+#endif
