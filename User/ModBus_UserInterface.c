@@ -953,7 +953,7 @@ u8 AckModBusWriteOneReg(u16 reg_addr,u16 reg_value)
       {
         StartAutoChargeFlag=reg_value;
         Relay_status|=0x10;
-        SetRelay(RELAY_PGV_POWER_Index,RELAY_ON);
+        //SetRelay(RELAY_PGV_POWER_Index,RELAY_ON);
         StopAutoChargeFlag=0;
         return_code=return_OK;
       }
@@ -972,7 +972,7 @@ u8 AckModBusWriteOneReg(u16 reg_addr,u16 reg_value)
           StartAutoChargeFlag=0;
           StopAutoChargeFlag=reg_value;
           Relay_status&=~0x10;
-          SetRelay(RELAY_PGV_POWER_Index,RELAY_OFF); 
+          //SetRelay(RELAY_PGV_POWER_Index,RELAY_OFF); 
         }
         if(reg_value&2)
         {
@@ -1043,11 +1043,11 @@ u8 AckModBusWriteOneReg(u16 reg_addr,u16 reg_value)
         Relay_status|=temp;
         if(Relay_status&0x10)
         {
-          SetRelay(RELAY_PGV_POWER_Index,RELAY_ON);
+          //SetRelay(RELAY_PGV_POWER_Index,RELAY_ON);
         }
         else
         {
-          SetRelay(RELAY_PGV_POWER_Index,RELAY_OFF);
+          //SetRelay(RELAY_PGV_POWER_Index,RELAY_OFF);
         }
         return_code=return_OK;
       }
@@ -1064,35 +1064,35 @@ u8 AckModBusWriteOneReg(u16 reg_addr,u16 reg_value)
         Relay_status=reg_value;
         if(Relay_status&0x1)
         {
-          SetRelay(RELAY_CHARGE_N_Index,RELAY_ON);
+          //SetRelay(RELAY_CHARGE_N_Index,RELAY_ON);
         }
         else
         {
-          SetRelay(RELAY_CHARGE_N_Index,RELAY_OFF); 
+          //SetRelay(RELAY_CHARGE_N_Index,RELAY_OFF); 
         }        
         if(Relay_status&0x2)
         {
-          SetRelay(RELAY_CHARGE_P_Index,RELAY_ON);
+          //SetRelay(RELAY_CHARGE_P_Index,RELAY_ON);
         }
         else
         {
-          SetRelay(RELAY_CHARGE_P_Index,RELAY_OFF);
+          //SetRelay(RELAY_CHARGE_P_Index,RELAY_OFF);
         }          
         if(Relay_status&0x10)
         {
-          SetRelay(RELAY_PGV_POWER_Index,RELAY_ON);
+          //SetRelay(RELAY_PGV_POWER_Index,RELAY_ON);
         }
         else
         {
-          SetRelay(RELAY_PGV_POWER_Index,RELAY_OFF);
+          //SetRelay(RELAY_PGV_POWER_Index,RELAY_OFF);
         }  
         if(Relay_status&0x20)
         {
-          SetRelay(RELAY_SPOWER_Index,RELAY_ON);
+          //SetRelay(RELAY_SPOWER_Index,RELAY_ON);
         }
         else
         {
-          SetRelay(RELAY_SPOWER_Index,RELAY_OFF);
+          //SetRelay(RELAY_SPOWER_Index,RELAY_OFF);
         }          
         
         return_code=return_OK;

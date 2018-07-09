@@ -21,9 +21,9 @@
 extern void LedDispInit(void);
 extern void LED_DISPLAY_Reset(void);
 extern void LED_WATER_Display(u16 SPEED);
-extern void LED_LOW_POWER_Display(u16 SPEED);
-extern void LED_IM_STOP_Display(u16 SPEED);
-extern void LED_FOLLOW_LINE_Display(u16 SPEED);
-extern void LED_BARRIER_Display(u16 SPEED);
-extern void LED_RFID_Display(u16 SPEED);
+//extern void LED_LOW_POWER_Display(u16 SPEED);
+//extern void LED_IM_STOP_Display(u16 SPEED);
+//extern void LED_FOLLOW_LINE_Display(u16 SPEED);
+//extern void LED_BARRIER_Display(u16 SPEED);
+//extern void LED_RFID_Display(u16 SPEED);
 #endif

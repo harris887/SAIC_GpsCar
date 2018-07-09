@@ -44,11 +44,6 @@ void LED_WATER_Display(u16 SPEED)
 
       ClrLED5();
       ClrLED6();
-      
-#if (EYE_Debug)
-      SET_DIDO_Relay(DIDO_LED_Eye,0); 
-#endif
-      SET_DIDO_Relay(DIDO_Breath,0);       
     }
     break;
   case 1:
@@ -59,11 +54,6 @@ void LED_WATER_Display(u16 SPEED)
       
       SetLED5();
       ClrLED6();      
-      
-#if (EYE_Debug)
-      SET_DIDO_Relay(DIDO_LED_Eye,1);
-#endif
-      SET_DIDO_Relay(DIDO_Breath,1);
     }
     break;   
   case 2:
@@ -74,11 +64,6 @@ void LED_WATER_Display(u16 SPEED)
 
       ClrLED5();
       SetLED6();
-      
-#if (EYE_Debug)
-      SET_DIDO_Relay(DIDO_LED_Eye,0);
-#endif
-      SET_DIDO_Relay(DIDO_Breath,0);
     }
     break;
   case 3:
@@ -89,11 +74,6 @@ void LED_WATER_Display(u16 SPEED)
 
       SetLED5();
       ClrLED6();
-      
-#if (EYE_Debug)
-      SET_DIDO_Relay(DIDO_LED_Eye,1);
-#endif
-      SET_DIDO_Relay(DIDO_Breath,1);
     }
     break;
   case 4:
@@ -104,11 +84,7 @@ void LED_WATER_Display(u16 SPEED)
 
       ClrLED5();
       SetLED6();      
-      
-#if (EYE_Debug)      
-      SET_DIDO_Relay(DIDO_LED_Eye,0);
-#endif
-      SET_DIDO_Relay(DIDO_Breath,0);
+
     }
     break;      
   }
@@ -137,8 +113,6 @@ void LED_LOW_POWER_Display(u16 SPEED)
     {
       water_led_status=1;
       water_led_timer=SPEED;
-      
-
     }
     break;
   case 1:

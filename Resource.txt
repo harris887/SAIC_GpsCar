@@ -1,0 +1,34 @@
+名称 接口形式 内部资源
+COM1  RS232  uart1
+COM2  RS232  uart2
+COM3  RS232  uart3
+COM4  RS485  uart4
+COM5  RS485  uart5
+COM6  CAN 
+COM7  RS232  WK-uart1
+COM8  RS232  WK-uart2
+COM9  RS485  WK-uart3
+COM10 RS485  WK-uart3
+COM11 RS485  WK-uart4 
+COM12 RS485  WK-uart4
+备注
+
+升级串口：      COM1
+工控机通讯串口：COM2
+电机接口x4      COM4 COM5
+DAM0404A        COM7
+DAM0808D        COM8
+
+---------------------------------------------
+SPI转4串口 - 子板【RS232 x2 RS485 x2】 -PB12~15
+CAN口
+RS232 x3
+RS485 x2
+PWM电机控制接口 x4
+遥控器接口                     -PD3 PD1 PD0 PA8 PD15
+蜂鸣器                         -PC5 
+IO控制LED等2个                 -PB4 PB5
+AD转换接口2个，电源电压检测1个 -PC0~3
+---------------------------------------------
+
+

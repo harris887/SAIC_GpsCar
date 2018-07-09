@@ -7,21 +7,19 @@
 
 /******************************************************************************/
 /*宏定义*/
-#define ADC1_DR_Address    ((u32)0x4001244C)
+#define ADC1_DR_Address         ((u32)0x4001244C)
 #define ADC_DMA_IRQChannel      DMA1_Channel1_IRQChannel
-
-
 /******************************************************************************/
 
-#define BATT_PIN    GPIO_Pin_3
-#define BATT_PORT   GPIOC
-#define AN_PIN      GPIO_Pin_0
-#define AN_PORT     GPIOC
-#define TEMP_SENSOR_PIN  GPIO_Pin_1
+#define BATT_PIN          GPIO_Pin_3
+#define BATT_PORT         GPIOC
+#define AN_PIN            GPIO_Pin_0
+#define AN_PORT           GPIOC
+#define TEMP_SENSOR_PIN   GPIO_Pin_1
 #define TEMP_SENSOR_PORT  GPIOC
 
-#define CHARGE_PIN  GPIO_Pin_2
-#define CHARGE_PORT  GPIOC
+#define CHARGE_PIN        GPIO_Pin_2
+#define CHARGE_PORT       GPIOC
 
 //---- LM35 相关 ----//
 #define COFF_AD_2_TEMPRATURE          0.0806

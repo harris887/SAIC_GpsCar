@@ -487,7 +487,7 @@ void AGV_RUN_Task(void)
         {
           //关闭巡线传感器电源
           Relay_status&=~0x10;
-          SetRelay(RELAY_PGV_POWER_Index,RELAY_OFF);          
+          //SetRelay(RELAY_PGV_POWER_Index,RELAY_OFF);          
           MOTO_IM_STOP();
           RFID_STOP_ANGIN_Timeout=5000;
           AGV_Delay=1500;
@@ -902,7 +902,7 @@ void AGV_RUN_Task(void)
         printf("RELAY 1 ON \n");
 #endif                  
               //打开正极继电器，待续
-              SetRelay(RELAY_CHARGE_P_Index,RELAY_ON);
+              //SetRelay(RELAY_CHARGE_P_Index,RELAY_ON);
               AGV_Delay=1000;
               AGV_RUN_SUB_Pro+=1;
             }
@@ -916,7 +916,7 @@ void AGV_RUN_Task(void)
         printf("RELAY 2 ON \n");
 #endif              
               //打开负极极继电器，待续
-              SetRelay(RELAY_CHARGE_N_Index,RELAY_ON);
+              //SetRelay(RELAY_CHARGE_N_Index,RELAY_ON);
               ChargeLongTimeout=DEFAULT_CHARGE_LONG_TIME_OUT;
               AGV_Delay=180000;//180s等待充电机开始充电
               AGV_RUN_SUB_Pro+=1;
@@ -960,8 +960,8 @@ void AGV_RUN_Task(void)
         printf("RELAY 1 2 OFF \n");
 #endif              
               //断开充电继电器
-              SetRelay(RELAY_CHARGE_P_Index,RELAY_OFF);
-              SetRelay(RELAY_CHARGE_N_Index,RELAY_OFF);
+              //SetRelay(RELAY_CHARGE_P_Index,RELAY_OFF);
+              //SetRelay(RELAY_CHARGE_N_Index,RELAY_OFF);
               SetBeep(2,800,1200);
               AGV_Delay=4000;
               AGV_RUN_SUB_Pro=0;

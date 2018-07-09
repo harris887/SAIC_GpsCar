@@ -176,7 +176,7 @@ void Check_DIDO_TASK(void)
     {
       DIDO_Enable = 1;
       Relay_status |= 0x20;
-      SetRelay(RELAY_SPOWER_Index, RELAY_ON); //RELAY_ON RELAY_OFF
+      //SetRelay(RELAY_SPOWER_Index, RELAY_ON); //RELAY_ON RELAY_OFF
     }
   }
   

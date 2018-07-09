@@ -18,7 +18,7 @@ int main(void)
   MovementListInit();
   //BUTTON_Init();
   BUZZER_Init();
-  RELAY_Init();
+
   LedDispInit();
   //LightSensor_Init();
   Adc_init();

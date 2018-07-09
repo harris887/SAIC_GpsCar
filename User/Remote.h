@@ -28,8 +28,8 @@ extern u8 REMOTE_SelectFlag;//1-ÊÖ±úÒ£¿ØÌ¬ON,0-ÊÖ±úÒ£¿ØÌ¬OFF
 #define REMOTE_PWM_CTRL_PORT        GPIOD
 #define REMOTE_PWM_CTRL_PIN         GPIO_Pin_15
 
-#define REMOTE_PWM_IN_PORT  GPIOA
-#define REMOTE_PWM_IN_PIN   GPIO_Pin_8
+#define REMOTE_PWM_IN_PORT          GPIOA
+#define REMOTE_PWM_IN_PIN           GPIO_Pin_8
 
 #define set_S0  GPIO_SetBits(REMOTE_PWM_SELECT_PORT,REMOTE_PWM_SELECT_S0_PIN)
 #define clr_S0  GPIO_ResetBits(REMOTE_PWM_SELECT_PORT,REMOTE_PWM_SELECT_S0_PIN)
