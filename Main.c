@@ -44,7 +44,7 @@ int main(void)
     Check_DIDO_TASK();
     BEEP_TASK();
 
-    PGV_COMM_TASK();
+    //PGV_COMM_TASK();
     MOTO_SPEED_CONTROL_TASK();
     
     CheckBatteryVolt_TASK();
@@ -70,11 +70,45 @@ int main(void)
       if(1)
       {
         static s16 speed = 0;
+        static s8 o_index = 0;
+        if(USART_BYTE == 'y')
+        {
+          USART_BYTE = 0;
+          printf("DIDO %d Off\n", o_index);
+          SET_DIDO_Relay(o_index--, 0);
+          if(o_index < 0) o_index = 11;
+          else if(o_index > 11) o_index = 0;
+        }        
+        if(USART_BYTE == 'Y')
+        {
+          USART_BYTE = 0;
+          printf("DIDO %d On\n", o_index);
+          SET_DIDO_Relay(o_index++, 1);
+          if(o_index < 0) o_index = 11;
+          else if(o_index > 11) o_index = 0;          
+        }
+        if(USART_BYTE == 'Z')
+        {
+          //USART_BYTE = 0;
+          printf("DIDO ack_num : %d %d, DI = %02X, AI = [%d , %d , %d, %d] %d, %d\n", MODBUS_Dido_0.read_success_num, MODBUS_Dido_1.read_success_num, \
+                 DIDO_D_INPUT_Status.LightStatus, \
+                 DIDO_A_INPUT_Status.Analog[0],   \
+                 DIDO_A_INPUT_Status.Analog[1],   \
+                 DIDO_A_INPUT_Status.Analog[2],   \
+                 DIDO_A_INPUT_Status.Analog[3],   \
+                 wk2124_rx_bytes[CH_DAM0808], \
+                 wk2124_rx_bytes[CH_DAM0404] \
+                   );        
+        }        
+        
         if(USART_BYTE == '+')
         {
           USART_BYTE = 0;
           speed += 10;
-          SetD1Rpm(0, speed);
+          SetD1Rpm(LEFT_MOTO_INDEX, speed);
+          SetD1Rpm(RIGHT_MOTO_INDEX, speed + 10);
+          SetD1Rpm(LEFT_2_MOTO_INDEX, speed + 20);
+          SetD1Rpm(RIGHT_2_MOTO_INDEX, speed + 30);
           sprintf(test_buffer,"rpm = %d\n", speed);
           FillUartTxBufN((u8*)test_buffer,strlen(test_buffer),1);          
         }
@@ -82,7 +116,10 @@ int main(void)
         {
           USART_BYTE = 0;
           speed -= 10;
-          SetD1Rpm(0, speed);
+          SetD1Rpm(LEFT_MOTO_INDEX, speed);
+          SetD1Rpm(RIGHT_MOTO_INDEX, speed + 10);
+          SetD1Rpm(LEFT_2_MOTO_INDEX, speed + 20);
+          SetD1Rpm(RIGHT_2_MOTO_INDEX, speed + 30);
           sprintf(test_buffer,"rpm = %d\n", speed);
           FillUartTxBufN((u8*)test_buffer,strlen(test_buffer),1);  
         }
@@ -137,16 +174,20 @@ int main(void)
       {
         if(USART_BYTE == 'A')
         {
-          sprintf(test_buffer,"L_Speed: %d mmps , R_Speed: %d mmps , L_001rpm: %d , R_001rpm: %d \n",
+          sprintf(test_buffer,"Speed_mmps: [ %d %d %d %d ], L_001rpm: [ %d %d %d %d ] \n",
                   MONITOR_St[LEFT_MOTO_INDEX].real_mms, MONITOR_St[RIGHT_MOTO_INDEX].real_mms,
-                  MONITOR_St[LEFT_MOTO_INDEX].real_rpm_reg, MONITOR_St[RIGHT_MOTO_INDEX].real_rpm_reg);
+                  MONITOR_St[LEFT_2_MOTO_INDEX].real_mms, MONITOR_St[RIGHT_2_MOTO_INDEX].real_mms,
+                  MONITOR_St[LEFT_MOTO_INDEX].real_rpm_reg, MONITOR_St[RIGHT_MOTO_INDEX].real_rpm_reg,
+                  MONITOR_St[LEFT_2_MOTO_INDEX].real_rpm_reg, MONITOR_St[RIGHT_2_MOTO_INDEX].real_rpm_reg);
           FillUartTxBufN((u8*)test_buffer,strlen(test_buffer),1);
         }
         else if(USART_BYTE == 'B')
         {
-          sprintf(test_buffer,"RLT:%d , RRT:%d , %d , %d ,[%d]\n", // , %d
-                  ReadMotoRpmTimes[LEFT_MOTO_INDEX],ReadMotoRpmTimes[RIGHT_MOTO_INDEX],
-                  MONITOR_St[LEFT_MOTO_INDEX].counter, MONITOR_St[RIGHT_MOTO_INDEX].counter, 
+          sprintf(test_buffer,"RT: [ %d %d %d %d ] , RRT: [ %d %d %d %d ] , TOTAL: %d \n", // , %d
+                  ReadMotoRpmTimes[LEFT_MOTO_INDEX] ,ReadMotoRpmTimes[RIGHT_MOTO_INDEX] ,
+                  ReadMotoRpmTimes[LEFT_2_MOTO_INDEX] ,ReadMotoRpmTimes[RIGHT_2_MOTO_INDEX] ,
+                  MONITOR_St[LEFT_MOTO_INDEX].counter ,MONITOR_St[RIGHT_MOTO_INDEX].counter , 
+                  MONITOR_St[LEFT_2_MOTO_INDEX].counter ,MONITOR_St[RIGHT_2_MOTO_INDEX].counter ,
                   MODBUS_Monitor.read_success_num);//rx5
           FillUartTxBufN((u8*)test_buffer,strlen(test_buffer),1);
         }
@@ -155,6 +196,7 @@ int main(void)
       {
         if(USART_BYTE == 'M')
         {
+          /*
           sprintf(test_buffer,"vol: %.3fV, curr: %.3fA, Temp: %d, charge_num: %d, is_charge: %d, MOS: %d, refresh: %d, reset_num = %d\n",
                   (float)BMS_St.voltage_mv*0.001,
                   (float)BMS_St.curr_ma*0.001,
@@ -164,6 +206,7 @@ int main(void)
                   (BMS_St.status&(BMS_ST_MOS_IN_ELE_OPEN_MASK|BMS_ST_MOS_OUT_ELE_OPEN_MASK)),
                   BMS_St.ack_num,
                   BMS_St.reset_num);//rx5
+          */
           FillUartTxBufN((u8*)test_buffer,strlen(test_buffer),1);
         }
       }
@@ -199,14 +242,11 @@ int main(void)
           RECIPROCATE_Op.wonder_reciprocate_times += 8;
           FillUartTxBufN("Reciprocate +4 \n", strlen("Reciprocate +4 \n"), 1);
         }        
-        if(USART_BYTE == 'Z')
-        {
-          USART_BYTE = 0;
-          printf("r = %d\n", u2_rx_num);        
-        }
+
         if(USART_BYTE == 'U')
         {
           USART_BYTE = 0;
+          printf("Update Program!\n");   
           BKP_WriteBackupRegister(BKP_DR1, TO_BOOT_UPDATE_FLAG);
           SetTimeoutJump(200);
         }

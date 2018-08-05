@@ -16,6 +16,7 @@ typedef struct
 //#define COFF_MMS_TO_RPM     0.1578396
 
 extern float COFF_001RPM_TO_MMS;
+extern float COFF_RPM_TO_MMS;
 //extern float COFF_MMS_TO_RPM;
 extern float COFF_MMS_TO_D1RPM;
 extern float COFF_DISTANCE;

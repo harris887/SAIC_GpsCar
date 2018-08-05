@@ -19,10 +19,11 @@
 
 typedef enum
 {
-  CH_RSV_0 = 0,
-  CH_RSV_1 ,
+  CH_DAM0808 = 0,
+  CH_DAM0404 ,
   CH_RSV_2 ,
   CH_BMS,
+  WK_CH_NUM,
 }WK2124_CH;
 
 //===========================================================
@@ -151,4 +152,6 @@ extern void WK2124_Init(void);
 extern void FillUartTxBuf_NEx(u8* pData,u8 num,u8 U_0_3);
 extern void WK2124_TransTask(void);
 void WK2124_Test(void);
+
+extern u32 wk2124_rx_bytes[WK_CH_NUM];
 #endif

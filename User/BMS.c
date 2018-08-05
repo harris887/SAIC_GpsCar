@@ -2,144 +2,178 @@
 #include "string.h"
 
 #define BMS_PRINTF_DEBUG      0
+#define BMS_UART_ENUM         CH_BMS
 u16 BMS_TimeOutCounter = DEFAULT_BMS_READ_START_DELAY;
-const u8* READ_PROTECT_PARAM = ":000100000E09~";
-const u8 BMS_READ_STATUS_ALL[6] = {0x06 ,0x01 ,0x10 ,0x00 ,0x00 ,0x17};
-#define BMS_TX_BUF_SIZE   32
-#define BMS_RX_BUF_SIZE   32
-u8 BMS_TX_Buf[BMS_TX_BUF_SIZE];
-u8 BMS_RX_Buf[BMS_RX_BUF_SIZE];
-u8 BMS_RX_BufIndex = 0;
-BMS_STATUS BMS_St = {0,0,0,0,0,0,0,0,0,0};
 
-void Byte2HexAscii(u8 value,char* str)
-{
-  const char* hex="0123456789ABCDEF";
-  str[0] = hex[value>>4];
-  str[1] = hex[value&15];
-}
+const u8 BMS_READ_STATUS_ALL[8] = {0x01 ,0x03 ,0x13 ,0x88 ,0x00 ,0x14, 0xC1, 0x6B};
+MODBUS_SAMPLE MODBUS_Bms = {
+  .MachineState=0,
+  .read_success_num=0,
+};
+BMS_STATUS BMS_St = {
+  .RefreshFlag = 0,
+};
 
-u8 BMS_Crc(u8* data, u16 len)
+void Analysis_Receive_From_BMS(u8 data,MODBUS_SAMPLE* pMODBUS, void* st)
 {
-  u16 i;
-  u8 tmp=0;
-  for(i=1;i<(len-3);i++)
-  {
-    tmp += data[i];
-  }
-  return tmp^0xFF;
-}
-
-u8 BMS_CheckSum(u8* data, u8 len)
-{
-  u8 tmp=0,i;
-  for(i=0; i<len; i++)
-  {
-    tmp += data[i];
-  }
-  return tmp;
-}
-
-u8 NewBMSFrame(u8 cmd, u8* buf)
-{
-  u16 len;
-  u8 crc;
-  BMS_FRAME* pF = (BMS_FRAME*)buf;
-  pF->SOI = BMS_SOI;
-  Byte2HexAscii(DEFAULT_BMS_ADDR, pF->Addr);
-  Byte2HexAscii(cmd, pF->Cmd);
-  Byte2HexAscii(DEFAULT_BMS_VAR, pF->Ver);
-  len = sizeof(BMS_FRAME);
-  
-  switch(cmd)
-  {
-  case CMD_GET_PROTECT_PARAM:
+    switch(pMODBUS->MachineState)//初始化 默认 为 00;
     {
-      buf[len-1] = BMS_EOI;
-      Byte2HexAscii(len>>8, pF->Len);
-      Byte2HexAscii(len&0xFF, pF->Len+2);     
-      crc = BMS_Crc(buf, len);
-      Byte2HexAscii(crc, buf+len-3); 
+    case 0:
+      {
+        if(data == 0x1)//从机地址
+        {
+          pMODBUS->MachineState = 0x01;
+          pMODBUS->BufIndex = 0;
+          pMODBUS->DataBuf[pMODBUS->BufIndex++] = data;
+        }
+        else
+        {
+          pMODBUS->MachineState = 0x0B;//缓冲数据区域清零要处理，中间数据为01，误认为是要从机地址。
+          pMODBUS->BufIndex = 0;
+        }  
+      }
+      break;
+      case 0x01:
+      {	 
+        pMODBUS->DataBuf[pMODBUS->BufIndex++] = data;
+        if(data == CMD_ModBus_ReadEx) 
+        {
+          pMODBUS->MachineState = 0x02; 
+          pMODBUS->ModBus_CMD = data;
+          pMODBUS->read_receive_timer = 0;
+        }
+        else
+        { 
+          pMODBUS->MachineState = 0x0B;
+          pMODBUS->BufIndex = 0;
+        }
+      }
+      break;
+      case 0x02: //read part 00
+      {    
+        //接收到读功能的字节数
+        pMODBUS->DataBuf[pMODBUS->BufIndex++] = data;
+        pMODBUS->read_receive_timer++;
+        if(pMODBUS->read_receive_timer == 1 )
+        {
+          pMODBUS->Read_Register_Num = pMODBUS->DataBuf[pMODBUS->BufIndex-1];
+          if(pMODBUS->Read_Register_Num <= 16)//长度限定
+          {
+            pMODBUS->MachineState = 0x03;
+          }
+          else
+          {
+            pMODBUS->MachineState = 0x00;
+          }
+          pMODBUS->read_receive_timer = 0;
+        } 
+      }
+      break;
+      case 0x03: //read part 01
+      {   
+        pMODBUS->DataBuf[pMODBUS->BufIndex++] = data;
+        pMODBUS->read_receive_timer++;
+        if(pMODBUS->read_receive_timer >= (pMODBUS->Read_Register_Num+2))
+        {
+          u16 cal_crc;
+          cal_crc=ModBus_CRC16_Calculate(pMODBUS->DataBuf,pMODBUS->Read_Register_Num+3);
+              
+          pMODBUS->receive_CRC_L = pMODBUS->DataBuf[pMODBUS->BufIndex-2];
+          pMODBUS->receive_CRC_H = pMODBUS->DataBuf[pMODBUS->BufIndex-1];
+          if(((cal_crc>>8) == pMODBUS->receive_CRC_H) && ((cal_crc&0xFF) == pMODBUS->receive_CRC_L))
+          {
+            pMODBUS->err_state = 0x00;//CRC校验正确 
+            pMODBUS->read_success_num += 1;
+            if(1)
+            {
+              BMS_STATUS* bms = (BMS_STATUS*)st;
+              memcpy(bms, pMODBUS->DataBuf + 3, sizeof(BMS_STATUS) - 1);
+              bms->RefreshFlag = 1;
+            }
+          }    
+          else	  
+          {
+            pMODBUS->err_state = 0x04;
+          }   
+          pMODBUS->BufIndex = 0;  
+          pMODBUS->read_receive_timer = 0;  
+          pMODBUS->MachineState = 0x00;                
+        }
+      }
+      break;
+      case 0x04: //write
+          {
+            pMODBUS->DataBuf[pMODBUS->BufIndex++] = data;
+            pMODBUS->read_receive_timer++;
+            if( pMODBUS->read_receive_timer == 6 )
+            {
+              u16 cal_crc;
+              cal_crc=ModBus_CRC16_Calculate(pMODBUS->DataBuf,6);
+              
+              pMODBUS->receive_CRC_L = pMODBUS->DataBuf[pMODBUS->BufIndex-2];
+              pMODBUS->receive_CRC_H = pMODBUS->DataBuf[pMODBUS->BufIndex-1];
+              if(((cal_crc>>8) == pMODBUS->receive_CRC_H) && ((cal_crc&0xFF) == pMODBUS->receive_CRC_L))
+              {
+
+              }    
+              else	  
+              {
+                pMODBUS->err_state = 0x04;
+              }   
+              pMODBUS->BufIndex = 0;  
+              pMODBUS->read_receive_timer = 0;  
+              pMODBUS->MachineState = 0;   
+            }
+          }
+        break;
+      case 0xb:
+        {
+        
+        }
+        break;  
+      default:
+        {
+          pMODBUS->MachineState=0;
+        }
+    }
+}
+
+void Check_BMS_Task(void)
+{
+  static u8 bms_trans_pro=0;
+  
+  switch(bms_trans_pro)
+  {
+  case 0:
+    {
+      if(BMS_TimeOutCounter==0)
+      {
+        BMS_RS485_TX_ACTIVE();
+        BMS_TimeOutCounter = 2;
+        bms_trans_pro++;
+      }
     }
     break;
-  }
-  return len;
-}
-
-u8 BMS_ReadStatus(void)
-{
-  u8 len = sizeof(BMS_READ_STATUS_ALL);
-  FillUartTxBuf_NEx((u8*)BMS_READ_STATUS_ALL, len, CH_BMS);
-  BMS_St.tx_num += 1;
-  return len;
-}
-
-void Handle_BmsRx(u8* data, u8 len)
-{
-  if((len+BMS_RX_BufIndex)<=BMS_RX_BUF_SIZE)
-  {
-    memcpy(BMS_RX_Buf+BMS_RX_BufIndex, data, len);
-    BMS_RX_BufIndex += len;
-    if(BMS_RX_BufIndex == sizeof(BMS_STATUS_FRAME))
+  case 1:
     {
-      u8 valid=0;
-      BMS_STATUS_FRAME* pBMS_St = (BMS_STATUS_FRAME*)BMS_RX_Buf;
-      if(pBMS_St->check_sum == BMS_CheckSum(BMS_RX_Buf, BMS_RX_BufIndex-1))
-        valid += 1;
-      if(pBMS_St->func_code == BMS_FUNC_CODE_STATUS)
-        valid += 1;
-      if(valid == 2)
+      if(BMS_TimeOutCounter==0)
       {
-        BMS_St.ack_num += 1;
-        BMS_St.voltage_mv = (pBMS_St->voltage_h<<8) | pBMS_St->voltage_l;
-        BMS_St.curr_ma = (pBMS_St->curr_h<<8) | pBMS_St->curr_l;
-        BMS_St.out_ele_num = (pBMS_St->out_ele_num_h<<8) | pBMS_St->out_ele_num_l;
-        BMS_St.in_ele_num = (pBMS_St->in_ele_num_h<<8) | pBMS_St->in_ele_num_l;
-        BMS_St.status = (pBMS_St->status_h<<8) | pBMS_St->status_l;
-        BMS_St.temprature = pBMS_St->temprature;
-        BMS_St.capacity = pBMS_St->capacity;
+        FillUartTxBuf_NEx((u8*)BMS_READ_STATUS_ALL, sizeof(BMS_READ_STATUS_ALL), BMS_UART_ENUM);
+        BMS_TimeOutCounter = 11;
+        bms_trans_pro++;
       }
-      BMS_RX_BufIndex -= sizeof(BMS_STATUS_FRAME);
     }
-  }
-}
-
-u16 Byte2HexStr(u8* data, u8 len, u8* str)
-{
-  u8 i;
-  const char* hex_str = "0123456789ABCDEF";
-  for(i=0; i<len; i++)
-  {
-    *str++ = hex_str[data[i]>>4];
-    *str++ = hex_str[data[i]&15];
-  }
-  *str++ = '\n'; //'\0'
-  return len*2+1;
-}
-
-void Flush_BmsRx(void)
-{
-#if (BMS_PRINTF_DEBUG)
-  static u8 buf[256];  
-  if(USART_BYTE == 'M')
-  {
-    if(BMS_RX_BufIndex != 0)
+    break;
+  case 2:
     {
-      u16 strlen = Byte2HexStr(BMS_RX_Buf, BMS_RX_BufIndex, buf);
-      FillUartTxBufN(buf, strlen, 1);
+      if(BMS_TimeOutCounter==0)
+      {
+        BMS_RS485_RX_ACTIVE();
+        BMS_TimeOutCounter = DEFAULT_BMS_READ_CYCLE;
+        bms_trans_pro = 0;
+      }
     }
-  }
-#endif
-  BMS_RX_BufIndex = 0;
-}
-
-u8 BMS_ResetCheck(void)
-{
-  if(BMS_St.tx_num >= (BMS_St.ack_num+DEFAULT_BMS_RESET_LOSE_NUM))
-  {
-    BMS_St.tx_num = BMS_St.ack_num;
-    BMS_St.reset_num += 1;
-    return 1;
-  }
-  return 0;
+    break;
+  default: bms_trans_pro = 0;
+  }    
 }

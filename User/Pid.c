@@ -1,19 +1,13 @@
 #include "user_inc.h"
 
 u16 PID_TimeOut;
-#if (WHEEL_SELECT == WHEEL_SMALL)
+
 PID_OPTION Pid={0,0,0,0,0,0,0,
   3.0,  //Kp
   0.1,  //Ki
   0.5   //Kd
   };
-#else
-PID_OPTION Pid={0,0,0,0,0,0,0,
-  6.0,  //Kp
-  0.1,  //Ki
-  1.0   //Kd
-  };
-#endif
+
 
 void PID_Init(void)
 {

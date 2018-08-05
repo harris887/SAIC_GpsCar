@@ -78,13 +78,10 @@ u8 FOLLOW_LINE_ADVANCE_TASK(u8* pFollowLineReset,u16 current_point,u16 temianl_p
     
     left_speed = left_speed * SpeedPersent;
     right_speed = right_speed * SpeedPersent;
-#if (WHEEL_SELECT == WHEEL_SMALL)
+
     SetD1Rpm(LEFT_MOTO_INDEX, (float)left_speed*0.001*(float)MAX_MOTO_SPEED_IN_D1RPM);
     SetD1Rpm(RIGHT_MOTO_INDEX, (float)right_speed*0.001*(float)MAX_MOTO_SPEED_IN_D1RPM);  
-#else
-    SetD1Rpm(LEFT_MOTO_INDEX, (float)left_speed*0.0005*(float)MAX_MOTO_SPEED_IN_D1RPM);
-    SetD1Rpm(RIGHT_MOTO_INDEX, (float)right_speed*0.0005*(float)MAX_MOTO_SPEED_IN_D1RPM);      
-#endif
+
   }
   return teminal_flag;
 }

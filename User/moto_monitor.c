@@ -2,9 +2,10 @@
 #include "string.h"
 
 #define MIN_MONITOR_DEV_ADDR  1
-#define MAX_MONITOR_DEV_ADDR  2
-MONITOR_STATUS MONITOR_St[MOTO_NUM]={{0,0,0,0,0},{0,0,0,0,0}};
+#define MAX_MONITOR_DEV_ADDR  MOTO_NUM
+MONITOR_STATUS MONITOR_St[MOTO_NUM]={{0,0,0,0,0} ,{0,0,0,0,0} ,{0,0,0,0,0} ,{0,0,0,0,0}};
 float COFF_001RPM_TO_MMS = 0.0633554;
+float COFF_RPM_TO_MMS = 0.0633554;
 //float COFF_MMS_TO_RPM = 0.1578396;
 float COFF_MMS_TO_D1RPM = 1.578396;
 float COFF_DISTANCE = 1.0;
@@ -16,7 +17,7 @@ MODBUS_SAMPLE MODBUS_Monitor = {
 
 void MONITOR_STATUS_Init(void)
 {
-  memset(MONITOR_St,0,sizeof(MONITOR_St));
+  memset(MONITOR_St, 0, sizeof(MONITOR_St));
 }
 
 void Analysis_Receive_From_Monitor(u8 data,MODBUS_SAMPLE* pMODBUS, MONITOR_STATUS* st)
@@ -106,7 +107,7 @@ void Analysis_Receive_From_Monitor(u8 data,MODBUS_SAMPLE* pMODBUS, MONITOR_STATU
               if(moto_enable_status[index]==0) st[index].real_rpm = 0;
               
               if(index & 0x1) st[index].real_rpm = -st[index].real_rpm;   //奇数电机速度反向
-              st[index].real_mms = (s16)roundf((float)st[index].real_rpm * COFF_001RPM_TO_MMS);
+              st[index].real_mms = (s16)roundf((float)st[index].real_rpm * COFF_RPM_TO_MMS);
               st[index].counter += 1;
             }
           }    
@@ -158,8 +159,8 @@ void Analysis_Receive_From_Monitor(u8 data,MODBUS_SAMPLE* pMODBUS, MONITOR_STATU
 
 void ROAD_RECORD_Task(void)
 {
-  static u32 record_counter[MOTO_NUM] = {0,0};
-  static u32 timer_bk[MOTO_NUM] = {0,0};
+  static u32 record_counter[MOTO_NUM] = {0 ,0 ,0 ,0};
+  static u32 timer_bk[MOTO_NUM] = {0 ,0 ,0 ,0};
   u8 i;
   u32 temp;
   for(i = 0; i < MOTO_NUM; i++)

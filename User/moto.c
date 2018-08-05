@@ -5,15 +5,16 @@
 
 #define MOTO_PRINTF_DEBUG               1
 
-#define MOTO_COMM_PORT_ENUM             5   // 使用 USART5 发送
-#define MOTO_CONTROL_CYCLE              12  // 20ms 的RS485通信周期 - 10
-#define DEFAULT_MOTO_READ_RPM_TIME_OUT  50
+
+#define MOTO_COMM_PORT_ENUM             5   // 使用 USART5 发送 
+#define MOTO_CONTROL_CYCLE              12  // 20ms 的RS485通信周期 - 10 , 12 ,100
+#define DEFAULT_MOTO_READ_RPM_TIME_OUT  100
 u16 MOTO_485COMM_Timeout = 2000;
-s16 moto_speed_in_rpm[MOTO_NUM] = {0,0}; // 0，0，
-u8 moto_enable_status[MOTO_NUM] = {0,0};
-u8 moto_enable_status_change_flag[MOTO_NUM] = {0,0};
-u16 MOTO_READ_RPM_Timeout[MOTO_NUM] = {DEFAULT_MOTO_READ_RPM_TIME_OUT,DEFAULT_MOTO_READ_RPM_TIME_OUT};
-u8 moto_reset_speed_up_down_time_flag[MOTO_NUM] = {0,0};
+s16 moto_speed_in_rpm[MOTO_NUM] = {0 ,0 ,0 ,0}; 
+u8 moto_enable_status[MOTO_NUM] = {0 ,0 ,0 ,0};
+u8 moto_enable_status_change_flag[MOTO_NUM] = {0 ,0 ,0 ,0};
+u16 MOTO_READ_RPM_Timeout[MOTO_NUM] = {DEFAULT_MOTO_READ_RPM_TIME_OUT ,DEFAULT_MOTO_READ_RPM_TIME_OUT ,DEFAULT_MOTO_READ_RPM_TIME_OUT ,DEFAULT_MOTO_READ_RPM_TIME_OUT};
+u8 moto_reset_speed_up_down_time_flag[MOTO_NUM] = {0 ,0 ,0 ,0};
 #define MOTO_SPEED_UP_DOWN_DELAY_TIME     100  //100
 const u8 MODBUS_MOTO_ENBALE[8] =
 {0x01 ,0x06 ,0x00 ,0x38 ,0x00 ,0x01 ,0xC9 ,0xC7};
@@ -27,12 +28,12 @@ const u8 MODBUS_MOTO_UP_TIME_SET[8] =
 const u8 MODBUS_MOTO_DOWN_TIME_SET[8] = 
 {0x01 ,0x06 ,0x00 ,0x31 ,0x00 ,0x64 ,0x00 ,0x00};
 const u8 MODBUS_MOTO_RPM_READ[8] = 
-{0x01 ,0x03 ,0x10 ,0x2D ,0x00 ,0x01 ,0x85, 0xF6};//0x01
-//{0x01 ,0x03 ,0x10 ,0x00 ,0x00 ,0x01 ,0x85, 0xF6};//0x01
+//{0x01 ,0x03 ,0x10 ,0x2D ,0x00 ,0x01 ,0x85, 0xF6}; // 单位：0.01RPM
+{0x01 ,0x03 ,0x10 ,0x00 ,0x00 ,0x01 ,0x85, 0xF6};   // 单位：RPM
 
 u8 moto_comm_buff[256];
-u32 ReadMotoRpmTimes[MOTO_NUM] = {0,0};
-u32 SetMotoRpmTimes[MOTO_NUM] = {0,0};
+u32 ReadMotoRpmTimes[MOTO_NUM] = {0 ,0 ,0 ,0};
+u32 SetMotoRpmTimes[MOTO_NUM] = {0 ,0 ,0 ,0};
 
 #if (FOLLOW_LINE_SENSOR == HALL_SENSOR) 
 extern s32 SPEED_PID(u8 expect_mid,u8 current_mid);
@@ -40,14 +41,10 @@ extern s32 SPEED_PID(u8 expect_mid,u8 current_mid);
 extern s32 SPEED_PID(s32 expect_offset,s32 current_offset);
 #endif
 //位移里程计，单位: mm
-float RoadLength[MOTO_NUM] = {0.0,0.0};
-s16 RealRpm[MOTO_NUM] = {0,0};
+float RoadLength[MOTO_NUM] = {0.0 ,0.0, 0.0 ,0.0};
+s16 RealRpm[MOTO_NUM] = {0 ,0 ,0 ,0};
 
-MOTO_FAULT_OPTION MOTO_FAULT_Op[MOTO_NUM]=
-{
-  {0,0,0,0},
-  {0,0,0,0},
-};
+
 
 float max_wheel_speed;//车轮最大速度，单位cm/S
 
@@ -72,9 +69,10 @@ void MOTO_Init(void)
   max_wheel_speed = Caculate_MAX_WHEEL_SPEED(WHEEL_DIAMETER_IN_CM, MAX_MOTO_SPEED_IN_RPM, SPEED_DOWN_RATIO);
   SPEED_UP_DOWN_STRUCT_Init(50,100,0.1,SPEED_UP_OPTION_List[DirectRun]);//加速度20cm/S^2,最高速度40cm/S,加速周期0.1s ,40
   SPEED_UP_DOWN_STRUCT_Init(5 ,10,0.1,SPEED_UP_OPTION_List[CircleRun]);
-  COFF_001RPM_TO_MMS = WHEEL_DIAMETER_IN_CM * 10.0 * PI * 0.01 / 60.0;
+  COFF_001RPM_TO_MMS = WHEEL_DIAMETER_IN_CM * 10.0 * PI * 0.01 / 60.0 / SPEED_DOWN_RATIO;
+  COFF_RPM_TO_MMS = WHEEL_DIAMETER_IN_CM * 10.0 * PI / 60.0 / SPEED_DOWN_RATIO;
   //COFF_MMS_TO_RPM = 60.0 / (WHEEL_DIAMETER_IN_CM * 10.0* PI) ;
-  COFF_MMS_TO_D1RPM = 60.0 / (WHEEL_DIAMETER_IN_CM * 10.0 * PI * 0.1) ;
+  COFF_MMS_TO_D1RPM = SPEED_DOWN_RATIO * 60.0 / (WHEEL_DIAMETER_IN_CM * 10.0 * PI ) ; //* 0.1
   COFF_DISTANCE = (float)MOD_BUS_Reg.COFF_DISTANCE_1000TIME * 0.001;
   
 #if (MOTO_PRINTF_DEBUG)
@@ -88,28 +86,32 @@ void SetD1Rpm(MOTO_INDEX_ENUM MOTO_SELECT,s16 d1rpm)
   if(d1rpm > MAX_MOTO_SPEED_IN_D1RPM) d1rpm = MAX_MOTO_SPEED_IN_D1RPM;
   else if(d1rpm < -MAX_MOTO_SPEED_IN_D1RPM)  d1rpm = -MAX_MOTO_SPEED_IN_D1RPM;  
   
-  if(MOTO_SELECT == LEFT_MOTO_INDEX)
+  if((MOTO_SELECT == LEFT_MOTO_INDEX) || (MOTO_SELECT == LEFT_2_MOTO_INDEX))
   {
-    RealRpm[LEFT_MOTO_INDEX] = d1rpm;
-    moto_speed_in_rpm[LEFT_MOTO_INDEX] = d1rpm;
+    RealRpm[MOTO_SELECT] = d1rpm;
+    moto_speed_in_rpm[MOTO_SELECT] = d1rpm;
   }
-  else if(MOTO_SELECT==RIGHT_MOTO_INDEX)
+  else if((MOTO_SELECT == RIGHT_MOTO_INDEX) || (MOTO_SELECT == RIGHT_2_MOTO_INDEX))
   {
-    RealRpm[RIGHT_MOTO_INDEX] = d1rpm;
-    moto_speed_in_rpm[RIGHT_MOTO_INDEX] = -d1rpm;
+    RealRpm[MOTO_SELECT] = d1rpm;
+    moto_speed_in_rpm[MOTO_SELECT] = -d1rpm;
   }  
 }
 
 void MOTO_IM_STOP(void)
 {
-  SetD1Rpm(LEFT_MOTO_INDEX,  0);
-  SetD1Rpm(RIGHT_MOTO_INDEX, 0);
+  SetD1Rpm(LEFT_MOTO_INDEX ,0);
+  SetD1Rpm(LEFT_2_MOTO_INDEX ,0);
+  SetD1Rpm(RIGHT_MOTO_INDEX ,0);
+  SetD1Rpm(RIGHT_2_MOTO_INDEX ,0);
 }
 
 void ResetMotoSpeedUpDownTime(void)
 {
   moto_reset_speed_up_down_time_flag[LEFT_MOTO_INDEX] = 1;
-  moto_reset_speed_up_down_time_flag[RIGHT_MOTO_INDEX] = 1;
+  moto_reset_speed_up_down_time_flag[LEFT_2_MOTO_INDEX] = 1;
+  moto_reset_speed_up_down_time_flag[RIGHT_MOTO_INDEX] = 1;  
+  moto_reset_speed_up_down_time_flag[RIGHT_2_MOTO_INDEX] = 1;
 }
 
 /*********************************************
@@ -119,7 +121,7 @@ void ResetMotoSpeedUpDownTime(void)
  ********************************************/
 void SLOW_DOWN_Task(u8* reset,u16 time_in_ms)
 {
-  static s16 slow_value_every_time[MOTO_NUM] = {0,0};
+  static s16 slow_value_every_time[MOTO_NUM] = {0 ,0 ,0 ,0};
   static s16 Speed_bk[MOTO_NUM];
   u8 i;
   if(PID_TimeOut==0)
@@ -261,6 +263,14 @@ void ReadMotoRpm(u8 moto_enum)
   FillUartTxBufN(moto_comm_buff,sizeof(MODBUS_MOTO_RPM_READ), MOTO_COMM_PORT_ENUM);
 }
 
+typedef enum
+{
+  MOTO_INIT = 0,
+  MOTO_SET_RPM,
+  MOTO_SET_IDEL,
+  MOTO_ACTION_NUM
+}MOTO_ACTION;
+
 /************************************
  ** 电机驱动器的控制任务
  ** 功能：
@@ -270,14 +280,14 @@ void ReadMotoRpm(u8 moto_enum)
  ***********************************/
 void MOTO_SPEED_CONTROL_TASK(void)
 {
-  static s16 moto_speed_in_rpm_bk[MOTO_NUM] = {0,0};
-  static u32 moto_disable_time_counter[MOTO_NUM] = {0,0};
+  static s16 moto_speed_in_rpm_bk[MOTO_NUM] = {0 ,0 ,0 ,0};
+  static u32 moto_disable_time_counter[MOTO_NUM] = {0 ,0 ,0 ,0};
   static u8 pro = 0;
   static u8 moto_enum = 0;
   static u8 InitIndex = 0;
   switch(pro)
   {
-  case 0: // Init : [set_free]
+  case MOTO_INIT: // Init : [set_free]
     {
       if(MOTO_485COMM_Timeout == 0)
       {
@@ -310,7 +320,7 @@ void MOTO_SPEED_CONTROL_TASK(void)
         {
           moto_enum = 0;
           InitIndex += 1;
-          if(InitIndex>=3) pro += 1;
+          if(InitIndex >= 3) pro += 1;
         }
       }
     }
@@ -457,8 +467,8 @@ void MOTO_SPEED_CONTROL_TASK(void)
     break;    
   case 7://useless
     {
-      static u8 IM_STOP_Flag[MOTO_NUM]={0,0};
-      static u8 IM_STOP_Status[MOTO_NUM]={0,0};
+      static u8 IM_STOP_Flag[MOTO_NUM]={0 ,0 ,0 ,0};
+      static u8 IM_STOP_Status[MOTO_NUM]={0 ,0 ,0 ,0};
       if(MOTO_485COMM_Timeout == 0)
       {
         if(moto_enum < MOTO_NUM)

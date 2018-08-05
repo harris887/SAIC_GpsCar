@@ -29,8 +29,9 @@
 #include "DIDO.h"
 //#include "ADS8431.h"
 #include "moto_monitor.h"
-#include "WK2124.h"
 #include "BMS.h"
+#include "WK2124.h"
+
 
 #define MODBUS_PARA_REFLUSH_FLASH_ENABLE  1//µ÷ÊÔ½×¶Î²»²ÁFLASH
 

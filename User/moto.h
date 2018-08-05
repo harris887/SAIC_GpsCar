@@ -3,27 +3,23 @@
 
 extern float max_wheel_speed;
 
-#define WHEEL_SMALL     0
-#define WHEEL_BIG       1
-#define WHEEL_SELECT    WHEEL_SMALL   
+  
 
+#define MOTO_COMM_BD                 115200
 /*电机_驱动器相关设置*/
-#define FULL_SPEED_STEP 1000.0
+#define FULL_SPEED_STEP           1000.0
 #define ROAD_RECORD_ONCE_TIME_MS  100
 #define MAX_WHEEL_RUN_LENGTH_IN_CM_PER_SECOND (max_wheel_speed*1.0)
 #define MAX_WHEEL_RUN_LENGTH_IN_CM_PER_100MS  (max_wheel_speed*0.1)
-#define MAX_WHEEL_RUN_LENGTH_IN_CM_PER_10MS  (max_wheel_speed*0.01)
+#define MAX_WHEEL_RUN_LENGTH_IN_CM_PER_10MS   (max_wheel_speed*0.01)
 
-#if (WHEEL_SELECT == WHEEL_SMALL)
-#define DEFAULT_WHEEL_DIAMETER_IN_MM  121
-#define MAX_MOTO_SPEED_IN_RPM     200 
-#else
-#define DEFAULT_WHEEL_DIAMETER_IN_MM  170 //big: 170, small: 121
-#define MAX_MOTO_SPEED_IN_RPM     142 
-#endif
-#define WHEEL_DIAMETER_IN_CM    (MOD_BUS_Reg.WHEEL_DIAMETER_IN_MM * 0.1)//12.1  //25 20 31 22.5 ，20.3 
-#define MAX_MOTO_SPEED_IN_D1RPM  (MAX_MOTO_SPEED_IN_RPM * 10)
-#define SPEED_DOWN_RATIO        1.0        //电机齿轮箱减速比
+
+#define DEFAULT_WHEEL_DIAMETER_IN_MM  200   // 200mm d
+#define MAX_MOTO_SPEED_IN_RPM         3000  // 3000r/s
+
+#define WHEEL_DIAMETER_IN_CM          (MOD_BUS_Reg.WHEEL_DIAMETER_IN_MM * 0.1) 
+#define MAX_MOTO_SPEED_IN_D1RPM       (MAX_MOTO_SPEED_IN_RPM * 1)  // 10 -> 1
+#define SPEED_DOWN_RATIO              4.0        //电机齿轮箱减速比
 
 
 //高电平使能，低电平去除falut
@@ -80,11 +76,12 @@ extern float max_wheel_speed;
 
 typedef enum
 {
-  LEFT_MOTO_INDEX=0,
+  LEFT_MOTO_INDEX = 0,
   RIGHT_MOTO_INDEX,
+  
+  LEFT_2_MOTO_INDEX,
+  RIGHT_2_MOTO_INDEX,
   MOTO_NUM,
-  //LEFT_2_MOTO_INDEX,
-  //RIGHT_2_MOTO_INDEX,
 }MOTO_INDEX_ENUM;
 
 #define PWM_CYCLE_COUNTER 10000

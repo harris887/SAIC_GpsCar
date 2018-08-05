@@ -1,8 +1,15 @@
 #include "user_inc.h"
 
-#define DEFAULT_WK2124_INIT_DELAY 2000
-#define DEFAULT_RD_WK2124_CYCLE   20
+#define DEFAULT_WK2124_INIT_DELAY 1000
+#define DEFAULT_RD_WK2124_CYCLE   4
 u16 WK2124_Timeout = DEFAULT_WK2124_INIT_DELAY;
+
+u32 WK2124_BD_List[WK_CH_NUM] = {
+  38400 , // CH_DIDO
+  38400 , // CH_DIDO
+  9600  , // 
+  9600  , // CH_BMS
+};
 
 void SPI2_MasterInit(void)
 {
@@ -172,9 +179,30 @@ void WK2124_Init(void)
     data[0]=1;
     wk2xxx_write_reg(i,WK2XXX_SPAGE,data,1);    
     //11.0592Mhz¾§Õñ£¬115200bps-0x0005 9600bps-71
-    data[0]=0x00;//
-    data[1]=71;//0x05
-    data[2]=0x00;
+    if(WK2124_BD_List[i] == 115200)
+    {
+      data[0] = 0;  data[1] = 5;  data[2] = 0;
+    }
+    else if(WK2124_BD_List[i] == 57600)
+    {
+      data[0] = 0;  data[1] = 11;  data[2] = 0;
+    }
+    else if(WK2124_BD_List[i] == 38400)
+    {
+      data[0] = 0;  data[1] = 17;  data[2] = 0;
+    }    
+    else if(WK2124_BD_List[i] == 19200)
+    {
+      data[0] = 0;  data[1] = 35;  data[2] = 0;
+    }    
+    else if(WK2124_BD_List[i] == 9600)
+    {
+      data[0] = 0;  data[1] = 71;  data[2] = 0;
+    }     
+    else
+    {
+      data[0] = 0;  data[1] = 71;  data[2] = 0;
+    }
     wk2xxx_write_reg(i,WK2XXX_BAUD1,data,3);
     
     //--------- SPAGE0 ---------
@@ -188,49 +216,12 @@ void FillUartTxBuf_NEx(u8* pData,u8 num,u8 U_0_3)
   wk2xxx_write_fifo(U_0_3,pData,num);  
 }
 
-
+u32 wk2124_rx_bytes[WK_CH_NUM] = {0, 0, 0, 0};
 void WK2124_TransTask(void)
 {
   static u8 temp_buf[256];
   u8 data[8],i;
-  static u8 bms_trans_pro=0;
-  
-  switch(bms_trans_pro)
-  {
-  case 0:
-    {
-      if(BMS_TimeOutCounter==0)
-      {
-        Flush_BmsRx();
-        BMS_RS485_TX_ACTIVE();
-        BMS_TimeOutCounter = 2;
-        bms_trans_pro++;
-      }
-    }
-    break;
-  case 1:
-    {
-      if(BMS_TimeOutCounter==0)
-      {
-        u8 tx_len = BMS_ReadStatus();
-        BMS_TimeOutCounter = tx_len*2+2;
-        bms_trans_pro++;
-      }
-    }
-    break;
-  case 2:
-    {
-      if(BMS_TimeOutCounter==0)
-      {
-        BMS_RS485_RX_ACTIVE();
-        BMS_TimeOutCounter = DEFAULT_BMS_READ_CYCLE;
-        if(BMS_ResetCheck()) BMS_TimeOutCounter = DEFAULT_BMS_RESET_TIME;
-        bms_trans_pro = 0;
-      }
-    }
-    break;
-  default: bms_trans_pro = 0;
-  }  
+  static u8 rx_time[WK_CH_NUM] = {0, 0, 0, 0};
   
   //---- RX ----
   if(WK2124_Timeout == 0)
@@ -239,20 +230,69 @@ void WK2124_TransTask(void)
     for(i=0;i<4;i++)
     {
        wk2xxx_read_reg(i,WK2XXX_RFCNT,data,1);
+       if(rx_time[i] > 0) rx_time[i] -= 1;
        if(data[0]!=0)
        {
           wk2xxx_read_fifo(i,temp_buf,data[0]);
           
           switch(i)
           {
+          case CH_DAM0808:
+            {
+              wk2124_rx_bytes[CH_DAM0808] += data[0];
+              rx_time[CH_DAM0808] = 5;
+              for(i = 0; i < data[0]; i++)
+              {              
+                Analysis_Receive_From_Dido(temp_buf[i], &MODBUS_Dido_0, &DIDO_D_INPUT_Status);
+              }
+            }
+            break;
+          case CH_DAM0404:
+            {
+              wk2124_rx_bytes[CH_DAM0404] += data[0];
+              rx_time[CH_DAM0404] = 5;
+              for(i = 0; i < data[0]; i++)
+              {              
+                Analysis_Receive_From_Dido(temp_buf[i], &MODBUS_Dido_1, &DIDO_A_INPUT_Status);
+              }
+            }
+            break;
           case CH_BMS:
             {
-              Handle_BmsRx(temp_buf, data[0]);
+              rx_time[CH_BMS] = 5;
+              for(i = 0; i < data[0]; i++)
+              {
+                Analysis_Receive_From_BMS(temp_buf[i], &MODBUS_Bms, &BMS_St);
+              }
             }
             break;
           }
        }
     }
+    
+    if(rx_time[CH_BMS] == 0)
+    {
+      if(MODBUS_Bms.MachineState)
+      {
+        MODBUS_Bms.MachineState = 0;
+      }
+    }  
+    
+    if(rx_time[CH_DAM0808] == 0)
+    {
+      if(MODBUS_Dido_0.MachineState)
+      {
+        MODBUS_Dido_0.MachineState = 0;
+      }
+    } 
+
+    if(rx_time[CH_DAM0404] == 0)
+    {
+      if(MODBUS_Dido_1.MachineState)
+      {
+        MODBUS_Dido_1.MachineState = 0;
+      }
+    }     
   }
 }
 

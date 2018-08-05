@@ -10,10 +10,17 @@
 
 typedef struct
 {
+  u8 RefreshFlag;
   u8 RelayStatus;
   u8 LightStatus;
-  u8 RefreshFlag;
-}DIDO_INPUT_STATUS;
+}DIDO_D_INPUT_STATUS;
+
+typedef struct
+{
+  u8 RefreshFlag; 
+  u8 RelayStatus;
+  u16 Analog[4];
+}DIDO_A_INPUT_STATUS;
 
 typedef enum
 {
@@ -30,11 +37,13 @@ typedef enum
 extern u16 DIDO_COMM_Timeout;
 extern u16 DIDO_READ_LIGHT_Timeout;
 extern u16 DIDO_ENABLE_Timeout;
-extern MODBUS_SAMPLE MODBUS_Dido;
-extern DIDO_INPUT_STATUS DIDO_INPUT_Status;
-extern u8 DIDO_RelayStatus;
+extern MODBUS_SAMPLE MODBUS_Dido_0;
+extern MODBUS_SAMPLE MODBUS_Dido_1;
+extern DIDO_D_INPUT_STATUS DIDO_D_INPUT_Status;
+extern DIDO_A_INPUT_STATUS DIDO_A_INPUT_Status;
+extern u16 DIDO_RelayStatus;
 
-void Analysis_Receive_From_Dido(u8 data,MODBUS_SAMPLE* pMODBUS, DIDO_INPUT_STATUS* st);
+void Analysis_Receive_From_Dido(u8 data,MODBUS_SAMPLE* pMODBUS, void* stt);
 void Check_DIDO_TASK(void);
 void SET_DIDO_Relay(u8 index,u8 status);
 

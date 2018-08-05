@@ -73,7 +73,7 @@ u16 Uart3RxTimeReload=B_9600_SILENCE_TIME;
 u16 Uart4RxTimeReload=B_9600_SILENCE_TIME;
 u16 Uart5RxTimeReload=B_19200_SILENCE_TIME;
 
-u16 RS485_SLAVE_TX_2_RX_Delay=RS485_SLAVE_TX_2_RX_DELAY_115200_TIME;
+u16 RS485_SLAVE_TX_2_RX_Delay = RS485_SLAVE_TX_2_RX_DELAY_115200_TIME;
 
 void Usart1_Init(void)
 {
@@ -300,7 +300,7 @@ void Usart5_Init(void)
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
   GPIO_Init(GPIOD, &GPIO_InitStructure);
   
-  USART_InitStructure.USART_BaudRate = 115200;//115200 19200
+  USART_InitStructure.USART_BaudRate = MOTO_COMM_BD;//115200 19200 57600
   USART_InitStructure.USART_WordLength = USART_WordLength_8b;
   USART_InitStructure.USART_StopBits = USART_StopBits_1;
   USART_InitStructure.USART_Parity = USART_Parity_No;
@@ -432,9 +432,7 @@ void FillUartTxBufN(u8* pData,u8 num,u8 U1_2_3)
   if(U1_2_3==1)     pUART= &UART1_Optx;
   else if(U1_2_3==2)    
   {
-    Delay_ms(30);
     pUART= &UART2_Optx;
-    //pUART->Buf[pUART->InIndex++]=0xaa;
   }
   else if(U1_2_3==3)    pUART= &UART3_Optx;
   else if(U1_2_3==4)    pUART= &UART4_Optx;
@@ -503,12 +501,12 @@ void UART_Task(void)
   
   if(UART3_Oprx.InIndex!=UART3_Oprx.OutIndex)
   {
-    Analysis_Receive_From_Dido(UART3_Oprx.Buf[UART3_Oprx.OutIndex++], &MODBUS_Dido, &DIDO_INPUT_Status);
+    
   }
   
   if(UART4_Oprx.InIndex!=UART4_Oprx.OutIndex)
   {
-    Receive_From_PGV(0, UART4_Oprx.Buf[UART4_Oprx.OutIndex++]);
+    
   }  
   
   if(UART5_Oprx.InIndex!=UART5_Oprx.OutIndex)
@@ -531,15 +529,12 @@ void UART_Task(void)
   
   if(Uart3RxTime==0)
   {
-    if(MODBUS_Dido.MachineState)
-    {
-      MODBUS_Dido.MachineState = 0;
-    }
+ 
   }
   
   if(Uart4RxTime==0)
   {
-    Receive_From_PGV(1,NULL);
+   
   }
  
   if(Uart5RxTime==0)
@@ -583,5 +578,4 @@ void UART_Task(void)
     break;
   default: MOTO_RS485_RX_TX_STAUTS = RS485_IDEL;
   }  
-  
 }
