@@ -188,7 +188,7 @@ int main(void)
                   ReadMotoRpmTimes[LEFT_2_MOTO_INDEX] ,ReadMotoRpmTimes[RIGHT_2_MOTO_INDEX] ,
                   MONITOR_St[LEFT_MOTO_INDEX].counter ,MONITOR_St[RIGHT_MOTO_INDEX].counter , 
                   MONITOR_St[LEFT_2_MOTO_INDEX].counter ,MONITOR_St[RIGHT_2_MOTO_INDEX].counter ,
-                  MODBUS_Monitor.read_success_num);//rx5
+                  MODBUS_Monitor.read_success_num);//rx5 MODBUS_Monitor.read_success_num
           FillUartTxBufN((u8*)test_buffer,strlen(test_buffer),1);
         }
       }
