@@ -23,7 +23,6 @@ int main(void)
   //LightSensor_Init();
   Adc_init();
   SysTick_Init(1);
-  PGV_Timer_Init();
   REMOTE_Init();//遥控部分
   Usart1_Init();
   Usart2_Init();
@@ -54,6 +53,7 @@ int main(void)
     AGV_RUN_Task();
     MOD_BUS_REG_MODIFY_Check();
     WK2124_TransTask();
+    Check_BMS_Task();
     
     TimeoutJump();
     FeedDog();    
@@ -101,6 +101,16 @@ int main(void)
                    );        
         }        
         
+        if(USART_BYTE == 'S')
+        {
+          u8* bb = (u8*)&BMS_St;
+          printf("BMS %d: RSOC %04X, MF %04X, |%02X, %02X, %02X, %02X\n", MODBUS_Bms.read_success_num, 
+                 BMS_St.RSOC, 
+                 BMS_St.ManufactureAccess,
+                 bb[0], bb[1], bb[2], bb[3]
+                 );
+        }          
+        
         if(USART_BYTE == '+')
         {
           USART_BYTE = 0;
@@ -143,19 +153,7 @@ int main(void)
           FillUartTxBufN((u8*)test_buffer,strlen(test_buffer),1);
         }
       }
-      if(1)
-      {
-        if(USART_BYTE == 'Q')
-        {
-          sprintf(test_buffer,"Y = %d ,NL = %d; X = %d NP = %d\n",
-               PGV_LANE_TACKING_Infor.YP,
-               PGV_LANE_TACKING_Infor.Status_NL,                
-               PGV_LANE_TACKING_Infor.XP,
-               PGV_LANE_TACKING_Infor.Status_NP);
-          FillUartTxBufN((u8*)test_buffer,strlen(test_buffer),1);
-        }
-        //前进方向，传感器不动，码带左边正最大60，右边负最小-60
-      }
+
       if(1)
       {
         if(USART_BYTE == 'C')

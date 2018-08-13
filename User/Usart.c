@@ -391,12 +391,10 @@ void UART4_ISR(void)
     {
       USART_ITConfig(UART4, USART_IT_TXE, DISABLE);
       UART4_Optx.Intrrupt=false;
-      
-      Modebus_read_cmd_tx_finish=1;
-      PGV_TimeOutCounter = 5;//6,5,4      
     }
   }
 }
+
 //u32 rx5 = 0;
 void UART5_ISR(void)
 {
@@ -429,14 +427,12 @@ int putchar(int ch)
 void FillUartTxBufN(u8* pData,u8 num,u8 U1_2_3)
 {
   UART_OPTION* pUART;
-  if(U1_2_3==1)     pUART= &UART1_Optx;
-  else if(U1_2_3==2)    
-  {
-    pUART= &UART2_Optx;
-  }
-  else if(U1_2_3==3)    pUART= &UART3_Optx;
-  else if(U1_2_3==4)    pUART= &UART4_Optx;
-  else    pUART= &UART5_Optx;
+  if(U1_2_3 == 1)     pUART= &UART1_Optx;
+  else if(U1_2_3 == 2)  pUART= &UART2_Optx;
+  else if(U1_2_3 == 3)  pUART= &UART3_Optx;
+  else if(U1_2_3 == 4)  pUART= &UART4_Optx;
+  else if(U1_2_3 == 5)  pUART= &UART5_Optx;
+  else pUART= &UART1_Optx;
   for(u8 i=0;i<num;i++)    pUART->Buf[pUART->InIndex++]=pData[i];
 }
 

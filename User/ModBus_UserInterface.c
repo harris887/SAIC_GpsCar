@@ -285,28 +285,7 @@ u8 AckModBusReadReg(u16 reg_addr,u16 reg_num)
     FillUartTxBufN(Send_Data_A8_array,index,U_TX_INDEX);
     return 1;
   }
-  else if((reg_addr==0x06)&&(reg_num==1))
-  {//读取眼睛电源继电器状态
-    u16 cal_crc;
-    u16 eye_status;
-    eye_status = ((DIDO_RelayStatus&(1<<DIDO_LED_Eye))?0x1:0x0);
-    Send_Data_A8_array[index++]=MOD_BUS_Reg.SLAVE_ADDR;
-    Send_Data_A8_array[index++]=CMD_ModBus_Read;
-    Send_Data_A8_array[index++]=(reg_num<<1)>>8;//byte length ,MSB
-    Send_Data_A8_array[index++]=(reg_num<<1)&0xFF;//byte length ,LSB
-    
-    //for(loop=0;loop<reg_num;loop++)
-    {
-      Send_Data_A8_array[index++]=eye_status>>8;
-      Send_Data_A8_array[index++]=eye_status&0xff;
-    }
-    cal_crc=ModBus_CRC16_Calculate(Send_Data_A8_array , index);
-    Send_Data_A8_array[index++]=cal_crc&0xFF;
-    Send_Data_A8_array[index++]=cal_crc>>8;
-    
-    FillUartTxBufN(Send_Data_A8_array,index,U_TX_INDEX);
-    return 1;
-  }      
+
   else if((reg_addr==0x07)&&(reg_num==1))
   {//读取AGV车体宽度
     u16 cal_crc;
@@ -401,63 +380,6 @@ u8 AckModBusReadReg(u16 reg_addr,u16 reg_num)
     FillUartTxBufN(Send_Data_A8_array,index,U_TX_INDEX);
     return 1;
   }  
-  else if((reg_addr==0x11)&&(reg_num==1))
-  {//读取PGV电源状态
-    u16 cal_crc;
-    u16 power_status= (Relay_status&0x10)?1:0;
-    Send_Data_A8_array[index++]=MOD_BUS_Reg.SLAVE_ADDR;
-    Send_Data_A8_array[index++]=CMD_ModBus_Read;
-    Send_Data_A8_array[index++]=(reg_num<<1)>>8;//byte length ,MSB
-    Send_Data_A8_array[index++]=(reg_num<<1)&0xFF;//byte length ,LSB
-    //for(loop=0;loop<reg_num;loop++)
-    {
-      Send_Data_A8_array[index++]=power_status>>8;
-      Send_Data_A8_array[index++]=power_status&0xff;
-    }
-    cal_crc=ModBus_CRC16_Calculate(Send_Data_A8_array , index);
-    Send_Data_A8_array[index++]=cal_crc&0xFF;
-    Send_Data_A8_array[index++]=cal_crc>>8;
-    FillUartTxBufN(Send_Data_A8_array,index,U_TX_INDEX);
-    return 1;
-  }    
-  else if((reg_addr==0x12)&&(reg_num==4))
-  {//读取PGV传感器信息
-    u16 cal_crc;
-    u16 infor_list[4];
-    if(PGV_LANE_TACKING_Infor.Status_NL==0)
-    {
-      infor_list[0] = *(u16*)&PGV_LANE_TACKING_Infor.YP;
-      infor_list[1] = PGV_LANE_TACKING_Infor.Angle;
-    }
-    else
-    {
-      infor_list[0] = 0x7FFF;
-      infor_list[1] = 0x7FFF;
-    }
-    if(PGV_LANE_TACKING_Infor.Status_NP==0)
-    {
-      infor_list[2] = PGV_LANE_TACKING_Infor.XP; 
-    }
-    else
-    {
-      infor_list[2] = 0x7FFF;
-    }
-    infor_list[3] = 0x7FFF;  
-    Send_Data_A8_array[index++]=MOD_BUS_Reg.SLAVE_ADDR;
-    Send_Data_A8_array[index++]=CMD_ModBus_Read;
-    Send_Data_A8_array[index++]=(reg_num<<1)>>8;//byte length ,MSB
-    Send_Data_A8_array[index++]=(reg_num<<1)&0xFF;//byte length ,LSB
-    for(loop=0;loop<reg_num;loop++)
-    {
-      Send_Data_A8_array[index++]=infor_list[loop]>>8;
-      Send_Data_A8_array[index++]=infor_list[loop]&0xff;
-    }
-    cal_crc=ModBus_CRC16_Calculate(Send_Data_A8_array , index);
-    Send_Data_A8_array[index++]=cal_crc&0xFF;
-    Send_Data_A8_array[index++]=cal_crc>>8;
-    FillUartTxBufN(Send_Data_A8_array,index,U_TX_INDEX);
-    return 1;
-  }
   else if((reg_addr==0x19)&&(reg_num==1))
   {
     //读取AGV车继电器状态
@@ -788,31 +710,7 @@ u8 AckModBusReadReg(u16 reg_addr,u16 reg_num)
     FillUartTxBufN(Send_Data_A8_array,index,U_TX_INDEX);
     return 1; 
   }
-  else if((reg_addr>=0x90)&&(reg_addr<=0x94)&&(reg_num==1))
-  {//read DO status
-    u16 cal_crc;
-    u16 temp = (DIDO_RelayStatus&(1<<(reg_addr-0x90)))?1:0;
-    if(reg_addr == 0x90) temp = ((DIDO_RelayStatus&(1<<DIDO_LED_Red))?0x1:0x0)|((DIDO_RelayStatus&(1<<DIDO_LED_Green))?0x2:0x0)|((DIDO_RelayStatus&(1<<DIDO_LED_Blue))?0x4:0x0);
-    else if(reg_addr == 0x91)  temp = ((DIDO_RelayStatus&(1<<DIDO_LED_Eye))?0x1:0x0);
-    else if(reg_addr == 0x92)  temp = ((DIDO_RelayStatus&(1<<DIDO_Fan))?0x1:0x0);
-    else if(reg_addr == 0x93)  temp = ((DIDO_RelayStatus&(1<<DIDO_Buzzer))?0x1:0x0);
-    else if(reg_addr == 0x94)  temp = ((DIDO_Breath&(1<<DIDO_Buzzer))?0x1:0x0);
-    else temp = 0;
-    
-    Send_Data_A8_array[index++]=MOD_BUS_Reg.SLAVE_ADDR;
-    Send_Data_A8_array[index++]=CMD_ModBus_Read;
-    Send_Data_A8_array[index++]=(reg_num<<1)>>8;//byte length ,MSB
-    Send_Data_A8_array[index++]=(reg_num<<1)&0xFF;//byte length ,LSB
-    //for(loop=0;loop<reg_num;loop++)
-    {
-      Send_Data_A8_array[index++]=(temp>>8)&0xFF;
-      Send_Data_A8_array[index++]=temp&0xFF;      
-    }
-    cal_crc=ModBus_CRC16_Calculate(Send_Data_A8_array , index);
-    Send_Data_A8_array[index++]=cal_crc&0xFF;
-    Send_Data_A8_array[index++]=cal_crc>>8;
-    FillUartTxBufN(Send_Data_A8_array,index,U_TX_INDEX);
-  }
+
   else if((reg_addr==0x98)&&(reg_num==1))
   {//读取软件急停开关传感器
     u16 cal_crc;
@@ -997,7 +895,7 @@ u8 AckModBusWriteOneReg(u16 reg_addr,u16 reg_value)
     {//控制眼睛
       if(reg_value<=1)
       {
-        SET_DIDO_Relay(DIDO_LED_Eye, reg_value);
+        //SET_DIDO_Relay(DIDO_LED_Eye, reg_value);
         return_code=return_OK;
       }
       else
@@ -1172,12 +1070,12 @@ u8 AckModBusWriteOneReg(u16 reg_addr,u16 reg_value)
     {//控制灯带
       if(reg_value<=0x7)
       {
-        if(reg_value&0x1) SET_DIDO_Relay(DIDO_LED_Red,1);
-        else SET_DIDO_Relay(DIDO_LED_Red,0);
-        if(reg_value&0x2) SET_DIDO_Relay(DIDO_LED_Green,1);
-        else SET_DIDO_Relay(DIDO_LED_Green,0);
-        if(reg_value&0x4) SET_DIDO_Relay(DIDO_LED_Blue,1);
-        else SET_DIDO_Relay(DIDO_LED_Blue,0);        
+        //if(reg_value&0x1) SET_DIDO_Relay(DIDO_LED_Red,1);
+        //else SET_DIDO_Relay(DIDO_LED_Red,0);
+        //if(reg_value&0x2) SET_DIDO_Relay(DIDO_LED_Green,1);
+        //else SET_DIDO_Relay(DIDO_LED_Green,0);
+        //if(reg_value&0x4) SET_DIDO_Relay(DIDO_LED_Blue,1);
+        //else SET_DIDO_Relay(DIDO_LED_Blue,0);        
         return_code=return_OK;
       }
       else
@@ -1190,7 +1088,7 @@ u8 AckModBusWriteOneReg(u16 reg_addr,u16 reg_value)
     {//控制眼睛
       if(reg_value<=1)
       {
-        SET_DIDO_Relay(DIDO_LED_Eye, reg_value);
+        //SET_DIDO_Relay(DIDO_LED_Eye, reg_value);
         return_code=return_OK;
       }
       else
@@ -1203,7 +1101,7 @@ u8 AckModBusWriteOneReg(u16 reg_addr,u16 reg_value)
     {//控制风扇
       if(reg_value<=1)
       {
-        SET_DIDO_Relay(DIDO_Fan, reg_value);
+        //SET_DIDO_Relay(DIDO_Fan, reg_value);
         return_code=return_OK;
       }
       else
@@ -1228,7 +1126,7 @@ u8 AckModBusWriteOneReg(u16 reg_addr,u16 reg_value)
     {//控制呼吸灯
       if(reg_value<=1)
       {
-        SET_DIDO_Relay(DIDO_Breath, reg_value);
+        //SET_DIDO_Relay(DIDO_Breath, reg_value);
         return_code=return_OK;
       }
       else

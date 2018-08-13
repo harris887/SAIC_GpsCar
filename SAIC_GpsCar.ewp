@@ -1724,12 +1724,6 @@
       <name>$PROJ_DIR$\User\Adc.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\User\ADS8431.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\User\ADS8431.h</name>
-    </file>
-    <file>
       <name>$PROJ_DIR$\User\BMS.c</name>
     </file>
     <file>
@@ -1800,12 +1794,6 @@
     </file>
     <file>
       <name>$PROJ_DIR$\User\moto_monitor.h</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\User\PGV.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\User\PGV.h</name>
     </file>
     <file>
       <name>$PROJ_DIR$\User\Pid.c</name>

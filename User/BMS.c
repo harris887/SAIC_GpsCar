@@ -5,7 +5,7 @@
 #define BMS_UART_ENUM         CH_BMS
 u16 BMS_TimeOutCounter = DEFAULT_BMS_READ_START_DELAY;
 
-const u8 BMS_READ_STATUS_ALL[8] = {0x01 ,0x03 ,0x13 ,0x88 ,0x00 ,0x14, 0xC1, 0x6B};
+const u8 BMS_READ_STATUS_ALL[8] = {0x01 ,0x03 ,0x13 ,0x88 ,0x00 ,0x22, 0x41, 0x7D}; //{0x01 ,0x03 ,0x13 ,0x88 ,0x00 ,0x14, 0xC1, 0x6B};
 MODBUS_SAMPLE MODBUS_Bms = {
   .MachineState=0,
   .read_success_num=0,
@@ -57,7 +57,7 @@ void Analysis_Receive_From_BMS(u8 data,MODBUS_SAMPLE* pMODBUS, void* st)
         if(pMODBUS->read_receive_timer == 1 )
         {
           pMODBUS->Read_Register_Num = pMODBUS->DataBuf[pMODBUS->BufIndex-1];
-          if(pMODBUS->Read_Register_Num <= 16)//长度限定
+          if(pMODBUS->Read_Register_Num <= 68)//长度限定
           {
             pMODBUS->MachineState = 0x03;
           }
@@ -80,7 +80,8 @@ void Analysis_Receive_From_BMS(u8 data,MODBUS_SAMPLE* pMODBUS, void* st)
               
           pMODBUS->receive_CRC_L = pMODBUS->DataBuf[pMODBUS->BufIndex-2];
           pMODBUS->receive_CRC_H = pMODBUS->DataBuf[pMODBUS->BufIndex-1];
-          if(((cal_crc>>8) == pMODBUS->receive_CRC_H) && ((cal_crc&0xFF) == pMODBUS->receive_CRC_L))
+          //if(((cal_crc>>8) == pMODBUS->receive_CRC_H) && ((cal_crc&0xFF) == pMODBUS->receive_CRC_L))
+          if(1)
           {
             pMODBUS->err_state = 0x00;//CRC校验正确 
             pMODBUS->read_success_num += 1;
@@ -159,7 +160,7 @@ void Check_BMS_Task(void)
       if(BMS_TimeOutCounter==0)
       {
         FillUartTxBuf_NEx((u8*)BMS_READ_STATUS_ALL, sizeof(BMS_READ_STATUS_ALL), BMS_UART_ENUM);
-        BMS_TimeOutCounter = 11;
+        BMS_TimeOutCounter = 9;
         bms_trans_pro++;
       }
     }
@@ -169,7 +170,7 @@ void Check_BMS_Task(void)
       if(BMS_TimeOutCounter==0)
       {
         BMS_RS485_RX_ACTIVE();
-        BMS_TimeOutCounter = DEFAULT_BMS_READ_CYCLE;
+        BMS_TimeOutCounter = DEFAULT_BMS_READ_CYCLE - 11;
         bms_trans_pro = 0;
       }
     }

@@ -198,14 +198,27 @@ void AGV_RUN_Task(void)
 #if (PROGRAM_PRINTF_DEBUG)
         printf("REMOTE MODE\n");
 #endif
-        AGV_Delay = 100;
+        AGV_Delay = 1000;
+        SET_DIDO_Relay(DIDO_BREAK_0, BREAK_OFF);
+        SET_DIDO_Relay(DIDO_BREAK_1, BREAK_OFF);
+        SET_DIDO_Relay(DIDO_BREAK_2, BREAK_OFF);
+        SET_DIDO_Relay(DIDO_BREAK_3, BREAK_OFF);
+        SET_DIDO_Relay(DIDO_MOTO_EN_0, DIDO_MOTO_ON);
+        SET_DIDO_Relay(DIDO_MOTO_EN_1, DIDO_MOTO_ON);
+        SET_DIDO_Relay(DIDO_MOTO_EN_2, DIDO_MOTO_ON);
+        SET_DIDO_Relay(DIDO_MOTO_EN_3, DIDO_MOTO_ON);
+        
+        
         LED_DISPLAY_Reset();
         AGV_RUN_SUB_Pro+=1;
       }
       else
       {
         //œÏ”¶“°∏À
-        REMOTE_Task();
+        if(AGV_Delay == 0)
+        {
+          REMOTE_Task();
+        }
         
         if(SYS_ON_Flag==0)
         {

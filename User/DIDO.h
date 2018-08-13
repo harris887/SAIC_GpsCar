@@ -24,15 +24,27 @@ typedef struct
 
 typedef enum
 {
-  DIDO_LED_Blue = 0,
-  DIDO_LED_Green,
-  DIDO_LED_Red,
-  DIDO_LED_Eye,
-  DIDO_Fan,
-  DIDO_Buzzer,
-  DIDO_Breath,
-  DIDO_Reserve
+  DIDO_Buzzer = 0,
+  DIDO_LIGHT,
+  DIDO_Reserve_0,
+  DIDO_Reserve_1,
+  
+  DIDO_BREAK_0,
+  DIDO_BREAK_1,
+  DIDO_BREAK_2,
+  DIDO_BREAK_3,
+  DIDO_MOTO_EN_0,
+  DIDO_MOTO_EN_1,
+  DIDO_MOTO_EN_2,
+  DIDO_MOTO_EN_3
+  
 }DIDO_OUT_INDEX;
+
+#define BREAK_ON   0
+#define BREAK_OFF  1
+
+#define DIDO_MOTO_ON 1
+#define DIDO_MOTO_OFF 0
 
 extern u16 DIDO_COMM_Timeout;
 extern u16 DIDO_READ_LIGHT_Timeout;

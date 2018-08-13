@@ -19,7 +19,15 @@ typedef struct
   u16 VCELL_MV[16];
   u32 BAT_MV;
   u32 BAT_MA;
-  u32 BAT_TEMP[4];
+  u16 BAT_TEMP[3];
+  u32 FCC;
+  u32 RC;
+  u16 RSOC;
+  u16 CycleCount;
+  u16 PackStatus;
+  u16 BatStatus;
+  u16 PackConfig;
+  u16 ManufactureAccess;
   
   u8 RefreshFlag;
 }BMS_STATUS;
@@ -36,5 +44,6 @@ extern u8 BMS_ReadStatus(void);
 extern void Flush_BmsRx(void);
 extern u8 BMS_ResetCheck(void);
 
+extern void Check_BMS_Task(void);
 extern void Analysis_Receive_From_BMS(u8 data,MODBUS_SAMPLE* pMODBUS, void* st);
 #endif
