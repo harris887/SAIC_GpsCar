@@ -517,9 +517,6 @@ void TIM2_IRQHandler(void)
 *******************************************************************************/
 void TIM3_IRQHandler(void)
 {
-  if(PGV_TimeOutCounter!=0) PGV_TimeOutCounter-=1;
-  if(PGV_CommandResetCounter!=0) PGV_CommandResetCounter-=1;
-  TIM3->SR = 0;
 }
 
 /*******************************************************************************

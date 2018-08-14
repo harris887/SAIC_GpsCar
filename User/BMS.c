@@ -3,6 +3,8 @@
 
 #define BMS_PRINTF_DEBUG      0
 #define BMS_UART_ENUM         CH_BMS
+#define U16_ED_SWAP(value)  ((value >> 8) | (value << 8))
+#define U32_ED_SWAP(value)  ((value >> 24) | (value << 24) | ((value >> 8) & 0xFF00) | ((value << 8) & 0xFF0000))
 u16 BMS_TimeOutCounter = DEFAULT_BMS_READ_START_DELAY;
 
 const u8 BMS_READ_STATUS_ALL[8] = {0x01 ,0x03 ,0x13 ,0x88 ,0x00 ,0x22, 0x41, 0x7D}; //{0x01 ,0x03 ,0x13 ,0x88 ,0x00 ,0x14, 0xC1, 0x6B};
@@ -87,8 +89,24 @@ void Analysis_Receive_From_BMS(u8 data,MODBUS_SAMPLE* pMODBUS, void* st)
             pMODBUS->read_success_num += 1;
             if(1)
             {
+              u8 i;
               BMS_STATUS* bms = (BMS_STATUS*)st;
               memcpy(bms, pMODBUS->DataBuf + 3, sizeof(BMS_STATUS) - 1);
+              if(1)
+              {
+                for(i = 0; i < 16; i++) bms->VCELL_MV[i] = U16_ED_SWAP(bms->VCELL_MV[i]);
+                bms->BAT_MV = U32_ED_SWAP(bms->BAT_MV);
+                bms->BAT_MA = U32_ED_SWAP(bms->BAT_MA);
+                for(i = 0; i < 3; i++)  bms->BAT_TEMP[i] = U16_ED_SWAP(bms->BAT_TEMP[i]);
+                bms->FCC = U32_ED_SWAP(bms->FCC);
+                bms->RC = U32_ED_SWAP(bms->RC);
+                bms->RSOC = U16_ED_SWAP(bms->RSOC);
+                bms->CycleCount = U16_ED_SWAP(bms->CycleCount);
+                bms->PackStatus = U16_ED_SWAP(bms->PackStatus);
+                bms->BatStatus = U16_ED_SWAP(bms->BatStatus);
+                bms->PackConfig = U16_ED_SWAP(bms->PackConfig);
+                bms->ManufactureAccess = U16_ED_SWAP(bms->ManufactureAccess);               
+              }
               bms->RefreshFlag = 1;
             }
           }    
@@ -178,3 +196,5 @@ void Check_BMS_Task(void)
   default: bms_trans_pro = 0;
   }    
 }
+
+ 
