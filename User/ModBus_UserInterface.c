@@ -1,5 +1,6 @@
 #include "user_inc.h"
 #include "stdlib.h"
+#include "string.h"
 
 #define MODBUS_USER_INTERFACE_PRINTF_DEBUG  0
 
@@ -730,7 +731,53 @@ u8 AckModBusReadReg(u16 reg_addr,u16 reg_num)
     Send_Data_A8_array[index++]=cal_crc>>8;
     FillUartTxBufN(Send_Data_A8_array,index,U_TX_INDEX);
     return 1;
-  }  
+  }
+  else if((reg_addr == 0xB0) && (reg_num == 7))  
+  { //读取 DAM0808_INPUT and DAM0808_OUTPUT and DAM0404_INPUT[4] and DAM0404_OUTPUT
+    u16 cal_crc;
+    u16 temp[7];
+    temp[0] = DIDO_D_INPUT_Status.LightStatus;
+    temp[1] = DIDO_RelayStatus & 0xFF;
+    temp[2] = DIDO_A_INPUT_Status.Analog[0];
+    temp[3] = DIDO_A_INPUT_Status.Analog[1];
+    temp[4] = DIDO_A_INPUT_Status.Analog[2];
+    temp[5] = DIDO_A_INPUT_Status.Analog[3];
+    temp[6] = (DIDO_RelayStatus >> 8) & 0xFF;
+    
+    Send_Data_A8_array[index++] = MOD_BUS_Reg.SLAVE_ADDR;
+    Send_Data_A8_array[index++] = CMD_ModBus_Read;
+    Send_Data_A8_array[index++] = (reg_num<<1)>>8;//byte length ,MSB
+    Send_Data_A8_array[index++] = (reg_num<<1)&0xFF;//byte length ,LSB
+    for(loop = 0; loop < reg_num; loop++)
+    {
+      Send_Data_A8_array[index++] = temp[loop] >> 8;
+      Send_Data_A8_array[index++] = temp[loop] & 0xff;
+    }
+    cal_crc=ModBus_CRC16_Calculate(Send_Data_A8_array , index);
+    Send_Data_A8_array[index++]=cal_crc&0xFF;
+    Send_Data_A8_array[index++]=cal_crc>>8;
+    FillUartTxBufN(Send_Data_A8_array,index,U_TX_INDEX);
+    return 1;
+  }
+  else if((reg_addr == 0xC0) && (reg_num == 16))  
+  {
+    u16 cal_crc;
+    Send_Data_A8_array[index++] = MOD_BUS_Reg.SLAVE_ADDR;
+    Send_Data_A8_array[index++] = CMD_ModBus_Read;
+    Send_Data_A8_array[index++] = (reg_num << 1) >> 8;   //byte length ,MSB
+    Send_Data_A8_array[index++] = (reg_num << 1) & 0xFF; //byte length ,LSB
+    
+    memcpy(Send_Data_A8_array + index, BMS_RX_Bytes + 16 * sizeof(u16), 15 * sizeof(u16));
+    index += (15 * sizeof(u16));
+    Send_Data_A8_array[index++] = 0;
+    Send_Data_A8_array[index++] = BMS_St.Valid;
+ 
+    cal_crc=ModBus_CRC16_Calculate(Send_Data_A8_array , index);
+    Send_Data_A8_array[index++]=cal_crc&0xFF;
+    Send_Data_A8_array[index++]=cal_crc>>8;
+    FillUartTxBufN(Send_Data_A8_array,index,U_TX_INDEX);
+    return 1;
+  }
   else
   {//数据错误、超出范围 illegal_data;Return-Code=0x03
     u16 cal_crc;

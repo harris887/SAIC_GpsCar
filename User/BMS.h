@@ -6,14 +6,6 @@
 #define DEFAULT_BMS_READ_CYCLE        1000
 
 
-
-
-
-
-
-
-
-
 typedef struct
 {
   u16 VCELL_MV[16];
@@ -30,11 +22,13 @@ typedef struct
   u16 ManufactureAccess;
   
   u8 RefreshFlag;
+  u8 Valid;
 }BMS_STATUS;
 
 extern u16 BMS_TimeOutCounter;
 extern BMS_STATUS BMS_St;
 extern MODBUS_SAMPLE MODBUS_Bms;
+extern u8 BMS_RX_Bytes[128];
 //extern u8 BMS_TX_Buf[32];
 //extern const u8 BMS_READ_STATUS_ALL[6];
 
@@ -46,4 +40,6 @@ extern u8 BMS_ResetCheck(void);
 
 extern void Check_BMS_Task(void);
 extern void Analysis_Receive_From_BMS(u8 data,MODBUS_SAMPLE* pMODBUS, void* st);
+u16 Get_BD_U16(u8** beam);
+u32 Get_BD_U32(u8** beam);
 #endif

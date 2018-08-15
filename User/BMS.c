@@ -7,14 +7,18 @@
 #define U32_ED_SWAP(value)  ((value >> 24) | (value << 24) | ((value >> 8) & 0xFF00) | ((value << 8) & 0xFF0000))
 u16 BMS_TimeOutCounter = DEFAULT_BMS_READ_START_DELAY;
 
-const u8 BMS_READ_STATUS_ALL[8] = {0x01 ,0x03 ,0x13 ,0x88 ,0x00 ,0x22, 0x41, 0x7D}; //{0x01 ,0x03 ,0x13 ,0x88 ,0x00 ,0x14, 0xC1, 0x6B};
+const u8 BMS_READ_STATUS_ALL[8] = {0x01 ,0x03 ,0x13 ,0x88 ,0x00 ,0x21, 0x01, 0x7C}; //{0x01 ,0x03 ,0x13 ,0x88 ,0x00 ,0x14, 0xC1, 0x6B};
 MODBUS_SAMPLE MODBUS_Bms = {
   .MachineState=0,
   .read_success_num=0,
 };
+
 BMS_STATUS BMS_St = {
   .RefreshFlag = 0,
+  .Valid = 0,
 };
+
+u8 BMS_RX_Bytes[128] = {0};
 
 void Analysis_Receive_From_BMS(u8 data,MODBUS_SAMPLE* pMODBUS, void* st)
 {
@@ -90,22 +94,24 @@ void Analysis_Receive_From_BMS(u8 data,MODBUS_SAMPLE* pMODBUS, void* st)
             if(1)
             {
               u8 i;
+              u8* bs = BMS_RX_Bytes; 
               BMS_STATUS* bms = (BMS_STATUS*)st;
-              memcpy(bms, pMODBUS->DataBuf + 3, sizeof(BMS_STATUS) - 1);
+              memcpy(BMS_RX_Bytes, pMODBUS->DataBuf + 3, 66);
+              
               if(1)
               {
-                for(i = 0; i < 16; i++) bms->VCELL_MV[i] = U16_ED_SWAP(bms->VCELL_MV[i]);
-                bms->BAT_MV = U32_ED_SWAP(bms->BAT_MV);
-                bms->BAT_MA = U32_ED_SWAP(bms->BAT_MA);
-                for(i = 0; i < 3; i++)  bms->BAT_TEMP[i] = U16_ED_SWAP(bms->BAT_TEMP[i]);
-                bms->FCC = U32_ED_SWAP(bms->FCC);
-                bms->RC = U32_ED_SWAP(bms->RC);
-                bms->RSOC = U16_ED_SWAP(bms->RSOC);
-                bms->CycleCount = U16_ED_SWAP(bms->CycleCount);
-                bms->PackStatus = U16_ED_SWAP(bms->PackStatus);
-                bms->BatStatus = U16_ED_SWAP(bms->BatStatus);
-                bms->PackConfig = U16_ED_SWAP(bms->PackConfig);
-                bms->ManufactureAccess = U16_ED_SWAP(bms->ManufactureAccess);               
+                for(i = 0; i < 16; i++) bms->VCELL_MV[i] = Get_BD_U16(&bs);
+                bms->BAT_MV = Get_BD_U32(&bs);
+                bms->BAT_MA = Get_BD_U32(&bs);
+                for(i = 0; i < 3; i++)  bms->BAT_TEMP[i] = Get_BD_U16(&bs);;
+                bms->FCC = Get_BD_U32(&bs);;
+                bms->RC = Get_BD_U32(&bs);;
+                bms->RSOC = Get_BD_U16(&bs);
+                bms->CycleCount = Get_BD_U16(&bs);
+                bms->PackStatus = Get_BD_U16(&bs);
+                bms->BatStatus = Get_BD_U16(&bs);
+                bms->PackConfig = Get_BD_U16(&bs);
+                bms->ManufactureAccess = Get_BD_U16(&bs);              
               }
               bms->RefreshFlag = 1;
             }
@@ -167,6 +173,9 @@ void Check_BMS_Task(void)
     {
       if(BMS_TimeOutCounter==0)
       {
+        if(BMS_St.RefreshFlag != 0) BMS_St.Valid = 1;
+        else BMS_St.Valid = 0;
+        BMS_St.RefreshFlag = 0;
         BMS_RS485_TX_ACTIVE();
         BMS_TimeOutCounter = 2;
         bms_trans_pro++;
@@ -197,4 +206,18 @@ void Check_BMS_Task(void)
   }    
 }
 
- 
+u16 Get_BD_U16(u8** beam) 
+{
+  u16 temp;
+  temp = (*beam[0] << 8) | (*beam[1] << 0);
+  *beam += 2;
+  return temp;
+}
+
+u32 Get_BD_U32(u8** beam) 
+{
+  u32 temp;
+  temp = ((u32)*beam[0] << 24) | ((u32)*beam[1] << 16) | ((u32)*beam[2] << 8) | ((u32)*beam[3] << 0);
+  *beam += 4;
+  return temp;
+}
