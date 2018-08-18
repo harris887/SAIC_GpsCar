@@ -13,6 +13,9 @@ u16 REMOTE_TimeCounter=0;
 u8 REMOTE_CHANNAL_CHANGE_Delay=0;
 u8 REMOTE_SelectFlag=0;//1-手柄遥控态ON,0-手柄遥控态OFF
 REMOTE_OPTION REMOTE_OPTION_List[REMOTE_CHANNEL_NUM];
+s32 RemoteDiffRate = 0;
+s16 RemoteLeft = 0;
+s16 RemoteRight = 0;
 
 void REMOTE_Init(void)
 {
@@ -98,9 +101,9 @@ void CacluteRemoteSpeed(s16* pWheelSpeedStep)
   //支持，
   //1-前进，2-后退，3-左转，4-右转
   u8 move_mode=0;
-  s32 up_down_dir,left_right_dir;
+  s32 up_down_dir,left_right_dir, diff;
   s32 Speed_gain;
-  s16 abs_speed;
+  s32 abs_speed;
   
   //数据有效性检测，待添加
   up_down_dir=-(REMOTE_OPTION_List[DIRECTION_FORWARD_BACKWARD_CHANNEL].pwm_step);//上正，下负
@@ -141,12 +144,14 @@ void CacluteRemoteSpeed(s16* pWheelSpeedStep)
   {
     left_right_dir += REMOTE_DEAD_THRESHOLD;
     left_right_dir = (left_right_dir*2)/7;
+    diff = left_right_dir;
     left_right_dir = (left_right_dir*Speed_gain)/100;
   }
   else if(left_right_dir > REMOTE_DEAD_THRESHOLD)
   {
     left_right_dir -= REMOTE_DEAD_THRESHOLD;
     left_right_dir = (left_right_dir*2)/7;
+    diff = left_right_dir;
     left_right_dir = (left_right_dir*Speed_gain)/100;
   }
   else
@@ -154,7 +159,50 @@ void CacluteRemoteSpeed(s16* pWheelSpeedStep)
     left_right_dir = 0;
   }  
   
-
+#if(1)
+  if(up_down_dir >= 0)
+  {
+    const s32 max_diff_rate = 20; // 30% 20%
+    diff = diff * max_diff_rate / 100;
+    abs_speed = up_down_dir; //sqrtf((up_down_dir * up_down_dir) + (left_right_dir * left_right_dir));
+    RemoteDiffRate = diff;
+    if(diff < 0) //左偏
+    {
+      pWheelSpeedStep[0] = abs_speed * (100 + diff) / 100;
+      pWheelSpeedStep[1] = abs_speed;
+    }
+    else //右偏
+    {
+      pWheelSpeedStep[0] = abs_speed;
+      pWheelSpeedStep[1] = abs_speed * (100 - diff) / 100;
+    }
+  }
+  else 
+  {
+#if(1) // 倒车差速
+    const s32 max_diff_rate = 20; // 30% 20%
+    diff = diff * max_diff_rate / 100;
+    abs_speed = up_down_dir; //sqrtf((up_down_dir * up_down_dir) + (left_right_dir * left_right_dir));
+    RemoteDiffRate = diff;
+    if(diff < 0) //左偏
+    {
+      pWheelSpeedStep[0] = abs_speed * (100 + diff) / 100;
+      pWheelSpeedStep[1] = abs_speed;
+    }
+    else //右偏
+    {
+      pWheelSpeedStep[0] = abs_speed;
+      pWheelSpeedStep[1] = abs_speed * (100 - diff) / 100;
+    }    
+#else // 倒车，直线行走无差速
+    abs_speed = abs_32(up_down_dir);
+    pWheelSpeedStep[0] = -abs_speed; //左轮   
+    pWheelSpeedStep[1] = -abs_speed; //右轮
+#endif
+  }
+  RemoteLeft = pWheelSpeedStep[0];
+  RemoteRight = pWheelSpeedStep[1];
+#else //old 
   //前后左右
   if(1)
   {
@@ -205,6 +253,7 @@ void CacluteRemoteSpeed(s16* pWheelSpeedStep)
     pWheelSpeedStep[1] = (s16)(abs_speed * DIFF_COFF);//右轮-abs_speed
     break;
   }
+#endif
 }
 
 //遥控器摇杆PWM扫描

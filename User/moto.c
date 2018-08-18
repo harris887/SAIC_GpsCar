@@ -15,7 +15,7 @@ u8 moto_enable_status[MOTO_NUM] = {0 ,0 ,0 ,0};
 u8 moto_enable_status_change_flag[MOTO_NUM] = {0 ,0 ,0 ,0};
 u16 MOTO_READ_RPM_Timeout[MOTO_NUM] = {DEFAULT_MOTO_READ_RPM_TIME_OUT ,DEFAULT_MOTO_READ_RPM_TIME_OUT ,DEFAULT_MOTO_READ_RPM_TIME_OUT ,DEFAULT_MOTO_READ_RPM_TIME_OUT};
 u8 moto_reset_speed_up_down_time_flag[MOTO_NUM] = {0 ,0 ,0 ,0};
-#define MOTO_SPEED_UP_DOWN_DELAY_TIME     100  //100
+#define MOTO_SPEED_UP_DOWN_DELAY_TIME     20  // 100 -> 20
 const u8 MODBUS_MOTO_ENBALE[8] =
 {0x01 ,0x06 ,0x00 ,0x38 ,0x00 ,0x01 ,0xC9 ,0xC7};
 const u8 MODBUS_MOTO_RPM_SET[8] = 

@@ -3,8 +3,6 @@
 
 #define BMS_PRINTF_DEBUG      0
 #define BMS_UART_ENUM         CH_BMS
-#define U16_ED_SWAP(value)  ((value >> 8) | (value << 8))
-#define U32_ED_SWAP(value)  ((value >> 24) | (value << 24) | ((value >> 8) & 0xFF00) | ((value << 8) & 0xFF0000))
 u16 BMS_TimeOutCounter = DEFAULT_BMS_READ_START_DELAY;
 
 const u8 BMS_READ_STATUS_ALL[8] = {0x01 ,0x03 ,0x13 ,0x88 ,0x00 ,0x21, 0x01, 0x7C}; //{0x01 ,0x03 ,0x13 ,0x88 ,0x00 ,0x14, 0xC1, 0x6B};
@@ -16,6 +14,7 @@ MODBUS_SAMPLE MODBUS_Bms = {
 BMS_STATUS BMS_St = {
   .RefreshFlag = 0,
   .Valid = 0,
+  .Num = 0,
 };
 
 u8 BMS_RX_Bytes[128] = {0};
@@ -103,9 +102,9 @@ void Analysis_Receive_From_BMS(u8 data,MODBUS_SAMPLE* pMODBUS, void* st)
                 for(i = 0; i < 16; i++) bms->VCELL_MV[i] = Get_BD_U16(&bs);
                 bms->BAT_MV = Get_BD_U32(&bs);
                 bms->BAT_MA = Get_BD_U32(&bs);
-                for(i = 0; i < 3; i++)  bms->BAT_TEMP[i] = Get_BD_U16(&bs);;
-                bms->FCC = Get_BD_U32(&bs);;
-                bms->RC = Get_BD_U32(&bs);;
+                for(i = 0; i < 3; i++)  bms->BAT_TEMP[i] = Get_BD_U16(&bs);
+                bms->FCC = Get_BD_U32(&bs);
+                bms->RC = Get_BD_U32(&bs);
                 bms->RSOC = Get_BD_U16(&bs);
                 bms->CycleCount = Get_BD_U16(&bs);
                 bms->PackStatus = Get_BD_U16(&bs);
@@ -114,6 +113,7 @@ void Analysis_Receive_From_BMS(u8 data,MODBUS_SAMPLE* pMODBUS, void* st)
                 bms->ManufactureAccess = Get_BD_U16(&bs);              
               }
               bms->RefreshFlag = 1;
+              bms->Num += 1;
             }
           }    
           else	  
@@ -209,15 +209,49 @@ void Check_BMS_Task(void)
 u16 Get_BD_U16(u8** beam) 
 {
   u16 temp;
-  temp = (*beam[0] << 8) | (*beam[1] << 0);
-  *beam += 2;
+  u8* c = *beam;
+  temp = ((u16)c[0] << 8) | ((u16)c[1] << 0);
+  *beam = c + 2;
   return temp;
 }
 
 u32 Get_BD_U32(u8** beam) 
 {
   u32 temp;
-  temp = ((u32)*beam[0] << 24) | ((u32)*beam[1] << 16) | ((u32)*beam[2] << 8) | ((u32)*beam[3] << 0);
-  *beam += 4;
+  u8* c = *beam;
+  temp = ((u32)c[0] << 24) | ((u32)c[1] << 16) | ((u32)c[2] << 8) | ((u32)c[3] << 0);
+  *beam = c + 4;
   return temp;
+}
+
+void PrintBmsInfor(void)
+{
+  printf("\r\n---------------------------\r\n");
+  printf("----------- BMS -----------\r\n");
+  printf("BAT_MV    : %d\r\n", BMS_St.BAT_MV);
+  printf("BAT_MA    : %d\r\n", BMS_St.BAT_MA);
+  printf("BAT_TEMP  : %d\r\n", BMS_St.BAT_TEMP[0]);
+  printf("BAT_TEMP  : %d\r\n", BMS_St.BAT_TEMP[1]);
+  printf("BAT_TEMP  : %d\r\n", BMS_St.BAT_TEMP[2]);
+  printf("FCC       : %d\r\n", BMS_St.FCC);
+  printf("RC        : %d\r\n", BMS_St.RC);  
+  printf("RSOC      : %d\r\n", BMS_St.RSOC); 
+
+  printf("CycleCount: %d  \r\n", BMS_St.CycleCount);
+  printf("PackStatus: %04X\r\n", BMS_St.PackStatus);  
+  printf("BatStatus : %04X\r\n", BMS_St.BatStatus); 
+  printf("Valid     : %d  \r\n", BMS_St.Valid);  
+  printf("Num       : %d  \r\n", master_read_num); 
+  printf("---------------------------\r\n");
+  if(1)
+  {
+    u8 i;
+    printf("BMS_RX_Bytes:\r\n");
+    for(i = 0; i < 66; i++)
+    {
+      if((i & 15) == 0) printf("\r\n");
+      printf("%02X ", BMS_RX_Bytes[i]);
+    }
+    printf("\r\n");
+  }
 }

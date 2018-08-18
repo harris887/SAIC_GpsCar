@@ -11,7 +11,9 @@ extern u8 REMOTE_CHANNAL_CHANGE_Delay;
 //extern u8 ControlMode;//0-自动控制，1-遥控
 
 extern u8 REMOTE_SelectFlag;//1-手柄遥控态ON,0-手柄遥控态OFF
-
+extern s32 RemoteDiffRate;
+extern s16 RemoteLeft;
+extern s16 RemoteRight;
 #define DIRECTION_LEFT_RIGHT_CHANNEL          0
 #define DIRECTION_FORWARD_BACKWARD_CHANNEL    1
 #define SPEED_GAIN_CHANNEL                    2

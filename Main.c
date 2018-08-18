@@ -194,28 +194,18 @@ int main(void)
       {
         if(USART_BYTE == 'M')
         {
-          /*
-          sprintf(test_buffer,"vol: %.3fV, curr: %.3fA, Temp: %d, charge_num: %d, is_charge: %d, MOS: %d, refresh: %d, reset_num = %d\n",
-                  (float)BMS_St.voltage_mv*0.001,
-                  (float)BMS_St.curr_ma*0.001,
-                  BMS_St.temprature,
-                  BMS_St.in_ele_num,
-                  (BMS_St.status&BMS_ST_BIT_IN_CHARGE_MASK)?1:0,
-                  (BMS_St.status&(BMS_ST_MOS_IN_ELE_OPEN_MASK|BMS_ST_MOS_OUT_ELE_OPEN_MASK)),
-                  BMS_St.ack_num,
-                  BMS_St.reset_num);//rx5
-          */
-          FillUartTxBufN((u8*)test_buffer,strlen(test_buffer),1);
+          USART_BYTE = 0;
+          PrintBmsInfor();
         }
       }
       if(1)
       {
         if(USART_BYTE == 'R')
         {
-          sprintf(test_buffer,"up_downl: %d, left_right: %d, Speed_gain: %d\n",
+          sprintf(test_buffer,"up_downl: %d, left_right: %d, Speed_gain: %d, Diff_rate: %d [%d , %d]\n",
                   REMOTE_OPTION_List[DIRECTION_FORWARD_BACKWARD_CHANNEL].pwm_step,
                   REMOTE_OPTION_List[DIRECTION_LEFT_RIGHT_CHANNEL].pwm_step, 
-                  REMOTE_OPTION_List[SPEED_GAIN_CHANNEL].pwm_step);
+                  REMOTE_OPTION_List[SPEED_GAIN_CHANNEL].pwm_step, RemoteDiffRate, RemoteLeft, RemoteRight);
           FillUartTxBufN((u8*)test_buffer,strlen(test_buffer),1);
         }    
       }

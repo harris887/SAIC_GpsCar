@@ -42,7 +42,7 @@ const u32 MOD_BUS_BD_LIST[MOD_BUS_BD_LIST_LENGTH]=
 const MOD_BUS_REG DEFAULT_MOD_BUS_Reg=
 {
   M_CONTROL_MODE_SPEED,
-  4,//8
+  8,//8
   DEFAULT_MODE_BUS_AGV_ADDR,
   DEFAULT_WHEEL_DIAMETER_IN_MM,
   DEFAULT_COFF_DISTANCE_1000TIME,
@@ -61,7 +61,7 @@ u16 M_BAT_Precent=100;//电量百分比
 u16 M_LightSensorStatus[8]={0,0,0,0,0,0,0,0};
 U_M_CONTROL_OPTION U_M_CONTROL_Op={M_CMD_STOP,0,0,0,0,0,0};
 
-
+u32 master_read_num = 0;
 /*******************************************************************
 函数名称:void Analysis_Receive_From_A8(u8 data)
 函数功能:接收上位机 命令解析函数 （状态机）
@@ -168,6 +168,7 @@ void Analysis_Receive_From_A8(u8 data)
                     A8_Modbus.err_state = 0x00;//CRC校验正确 
                     //printf("uart2_rx\n");
                     AckModBusReadReg(A8_Modbus.Read_Register_Add,A8_Modbus.Read_Register_Num);
+                    master_read_num += 1;
                 }
                 else	  
                 {

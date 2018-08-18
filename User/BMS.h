@@ -23,6 +23,7 @@ typedef struct
   
   u8 RefreshFlag;
   u8 Valid;
+  u32 Num;
 }BMS_STATUS;
 
 extern u16 BMS_TimeOutCounter;
@@ -42,4 +43,5 @@ extern void Check_BMS_Task(void);
 extern void Analysis_Receive_From_BMS(u8 data,MODBUS_SAMPLE* pMODBUS, void* st);
 u16 Get_BD_U16(u8** beam);
 u32 Get_BD_U32(u8** beam);
+void PrintBmsInfor(void);
 #endif

@@ -15,7 +15,7 @@ extern float max_wheel_speed;
 
 
 #define DEFAULT_WHEEL_DIAMETER_IN_MM  200   // 200mm d
-#define MAX_MOTO_SPEED_IN_RPM         3000  // 3000r/m
+#define MAX_MOTO_SPEED_IN_RPM         600  // std: 3000r/m, -> 600
 
 #define WHEEL_DIAMETER_IN_CM          (MOD_BUS_Reg.WHEEL_DIAMETER_IN_MM * 0.1) 
 #define MAX_MOTO_SPEED_IN_D1RPM       (MAX_MOTO_SPEED_IN_RPM * 1)  // 10 -> 1
