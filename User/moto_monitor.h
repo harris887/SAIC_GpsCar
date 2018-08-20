@@ -23,6 +23,7 @@ extern float COFF_DISTANCE;
 extern MONITOR_STATUS MONITOR_St[MOTO_NUM];
 extern MODBUS_SAMPLE MODBUS_Monitor;
 extern u16 MOTO_READ_RPM_Timeout[MOTO_NUM];
+extern u16 rpm_rate[MOTO_NUM];
 
 extern void MONITOR_STATUS_Init(void);
 extern void Analysis_Receive_From_Monitor(u8 data,MODBUS_SAMPLE* pMODBUS, MONITOR_STATUS* st);

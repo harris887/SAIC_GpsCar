@@ -42,7 +42,7 @@
 
 
 
-
+#define READ_RPM_RATE_1000          0  //╤ах║в╙╬ьбй
 
 
   

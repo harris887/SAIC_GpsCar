@@ -7,8 +7,10 @@
 #define DEFAULT_DIDO_COMM_TIME_OUT        12
 #define DEFAULT_DIDO_READ_LIGHT_TIME_OUT  100
 #define DEFAULT_DIDO_ENABLE_TIME_OUT      1000
-#define DI_IM_STOP_MASK                   0x1
-#define DI_TOUCH_MASK                     0x2
+#define DI_TOUCH_F_MASK                   0x10
+#define DI_TOUCH_B_MASK                   0x20
+#define DI_IM_STOP_MASK                   0x40
+
 
 u16 DIDO_COMM_Timeout = DEFAULT_DIDO_ENABLE_TIME_OUT;
 u16 DIDO_READ_LIGHT_Timeout = DEFAULT_DIDO_READ_LIGHT_TIME_OUT;
@@ -136,7 +138,9 @@ void Analysis_Receive_From_Dido(u8 data,MODBUS_SAMPLE* pMODBUS, void* stt)
               {
                 st->LightStatus  = pMODBUS->DataBuf[3];
                 BUTTON_IM_STOP_Flag = (st->LightStatus & DI_IM_STOP_MASK)?1:0;
-                BARRIER_Flag = (st->LightStatus & DI_TOUCH_MASK)?1:0;
+                BARRIER_Flag = 0;
+                BARRIER_Flag |= (st->LightStatus & DI_TOUCH_F_MASK)?0x1:0;
+                BARRIER_Flag |= (st->LightStatus & DI_TOUCH_B_MASK)?0x2:0;
               }
             }
             else if(pMODBUS->ModBus_CMD == CMD_ModBus_Read)
