@@ -54,6 +54,7 @@ void SysTick_IrqHandler(void)
     if(BMS_TimeOutCounter) BMS_TimeOutCounter--;
     if(WK2124_Timeout) WK2124_Timeout--;
     if(JumpTimer) JumpTimer--;
+    if(MOTO_CheckMaxCurrent_Timeout) MOTO_CheckMaxCurrent_Timeout--;
     
     //if(RFID_ONLINE_Timeout!=0) RFID_ONLINE_Timeout--;
     //if(US_0_Timeout)  US_0_Timeout--;

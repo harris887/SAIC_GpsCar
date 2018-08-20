@@ -160,11 +160,11 @@ void CacluteRemoteSpeed(s16* pWheelSpeedStep)
   }  
   
 #if(1)
-  if(up_down_dir >= 0)
+  if(1)
   {
-    const s32 max_diff_rate = 20; // 30% 20%
+    const s32 max_diff_rate = REMOTE_TWO_SIDE_DIFF_RATE; 
     diff = diff * max_diff_rate / 100;
-    abs_speed = up_down_dir; //sqrtf((up_down_dir * up_down_dir) + (left_right_dir * left_right_dir));
+    abs_speed = up_down_dir; 
     RemoteDiffRate = diff;
     if(diff < 0) //×óÆ«
     {
@@ -175,30 +175,7 @@ void CacluteRemoteSpeed(s16* pWheelSpeedStep)
     {
       pWheelSpeedStep[0] = abs_speed;
       pWheelSpeedStep[1] = abs_speed * (100 - diff) / 100;
-    }
-  }
-  else 
-  {
-#if(1) // µ¹³µ²îËÙ
-    const s32 max_diff_rate = 20; // 30% 20%
-    diff = diff * max_diff_rate / 100;
-    abs_speed = up_down_dir; //sqrtf((up_down_dir * up_down_dir) + (left_right_dir * left_right_dir));
-    RemoteDiffRate = diff;
-    if(diff < 0) //×óÆ«
-    {
-      pWheelSpeedStep[0] = abs_speed * (100 + diff) / 100;
-      pWheelSpeedStep[1] = abs_speed;
-    }
-    else //ÓÒÆ«
-    {
-      pWheelSpeedStep[0] = abs_speed;
-      pWheelSpeedStep[1] = abs_speed * (100 - diff) / 100;
-    }    
-#else // µ¹³µ£¬Ö±ÏßÐÐ×ßÎÞ²îËÙ
-    abs_speed = abs_32(up_down_dir);
-    pWheelSpeedStep[0] = -abs_speed; //×óÂÖ   
-    pWheelSpeedStep[1] = -abs_speed; //ÓÒÂÖ
-#endif
+    }  
   }
   RemoteLeft = pWheelSpeedStep[0];
   RemoteRight = pWheelSpeedStep[1];
@@ -426,8 +403,8 @@ void REMOTE_Task(void)
     s16 rpm[2];
     
     CacluteRemoteSpeed(WheelSpeedStep);
-    rpm[LEFT_MOTO_INDEX] = (s32)MAX_MOTO_SPEED_IN_D1RPM*(s32)WheelSpeedStep[LEFT_MOTO_INDEX]/(s32)MAX_SPEED_STEP;
-    rpm[RIGHT_MOTO_INDEX] = (s32)MAX_MOTO_SPEED_IN_D1RPM*(s32)WheelSpeedStep[RIGHT_MOTO_INDEX]/(s32)MAX_SPEED_STEP;
+    rpm[LEFT_MOTO_INDEX] = (s32)MAX_REMOTE_SPEED_IN_D1RPM * (s32)WheelSpeedStep[LEFT_MOTO_INDEX] / (s32)MAX_SPEED_STEP;
+    rpm[RIGHT_MOTO_INDEX] = (s32)MAX_REMOTE_SPEED_IN_D1RPM * (s32)WheelSpeedStep[RIGHT_MOTO_INDEX] / (s32)MAX_SPEED_STEP;
     SetD1Rpm(LEFT_MOTO_INDEX, rpm[LEFT_MOTO_INDEX]);
     SetD1Rpm(LEFT_2_MOTO_INDEX, rpm[LEFT_MOTO_INDEX]);
     SetD1Rpm(RIGHT_MOTO_INDEX, rpm[RIGHT_MOTO_INDEX]);

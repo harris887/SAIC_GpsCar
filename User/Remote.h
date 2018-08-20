@@ -3,7 +3,8 @@
 
 #define DIFF_COFF  (-1.0)
 
-#define REMOTE_COUNTER_TIMER    TIM5
+#define REMOTE_COUNTER_TIMER           TIM5
+#define REMOTE_TWO_SIDE_DIFF_RATE      20  // 30% -> 20%
 
 
 extern u8 REMOTE_SINGLE_CHANNAL_Timtout;

@@ -739,17 +739,12 @@ u8 AckModBusReadReg(u16 reg_addr,u16 reg_num)
     u16 temp[7];
     temp[0] = DIDO_D_INPUT_Status.LightStatus;
     temp[1] = DIDO_RelayStatus & 0xFF;
-#if (READ_RPM_RATE_1000)
-    temp[2] = rpm_rate[0];
-    temp[3] = rpm_rate[1];
-    temp[4] = rpm_rate[2];
-    temp[5] = rpm_rate[3];
-#else
+
     temp[2] = DIDO_A_INPUT_Status.Analog[0];
     temp[3] = DIDO_A_INPUT_Status.Analog[1];
     temp[4] = DIDO_A_INPUT_Status.Analog[2];
     temp[5] = DIDO_A_INPUT_Status.Analog[3];
-#endif
+
     temp[6] = (DIDO_RelayStatus >> 8) & 0xFF;
     
     Send_Data_A8_array[index++] = MOD_BUS_Reg.SLAVE_ADDR;

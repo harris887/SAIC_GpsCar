@@ -15,12 +15,15 @@ extern float max_wheel_speed;
 
 
 #define DEFAULT_WHEEL_DIAMETER_IN_MM  200   // 200mm d
-#define MAX_MOTO_SPEED_IN_RPM         600  // std: 3000r/m, -> 600
+#define MAX_MOTO_SPEED_IN_RPM         3000  // std: 3000r/m
 
 #define WHEEL_DIAMETER_IN_CM          (MOD_BUS_Reg.WHEEL_DIAMETER_IN_MM * 0.1) 
 #define MAX_MOTO_SPEED_IN_D1RPM       (MAX_MOTO_SPEED_IN_RPM * 1)  // 10 -> 1
 #define SPEED_DOWN_RATIO              4.0        //电机齿轮箱减速比
+#define MAX_REMOTE_SPEED_IN_D1RPM     600        // 遥控器控制时最高限制转速
 
+#define MAX_MOTO_EA_THRESHOLD_0       2500  // 25A
+#define MAX_MOTO_EA_THRESHOLD_1       1500  // 15A
 
 //高电平使能，低电平去除falut
 #define LEFT_MOTO_EN_PIN    GPIO_Pin_3
@@ -185,5 +188,6 @@ extern float RoadLength[MOTO_NUM];
 extern void SetD1Rpm(MOTO_INDEX_ENUM MOTO_SELECT,s16 d01rpm);
 extern u32 ReadMotoRpmTimes[MOTO_NUM];
 extern u8 moto_enable_status[MOTO_NUM];
+extern u16 MOTO_CheckMaxCurrent_Timeout;
 void ResetMotoSpeedUpDownTime(void);
 #endif

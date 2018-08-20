@@ -103,10 +103,6 @@ void Analysis_Receive_From_Monitor(u8 data,MODBUS_SAMPLE* pMODBUS, MONITOR_STATU
             if((index>=MIN_MONITOR_DEV_ADDR)&&(index<=MAX_MONITOR_DEV_ADDR))
             {
               index -= MIN_MONITOR_DEV_ADDR;
-#if (READ_RPM_RATE_1000)
-              rpm_rate[index] = (pMODBUS->DataBuf[3]<<8) | pMODBUS->DataBuf[4];
-              st[index].counter += 1;
-#else
               *((u16*)(&(st[index].real_rpm_reg))) = (pMODBUS->DataBuf[3]<<8) | pMODBUS->DataBuf[4];
               st[index].real_rpm = st[index].real_rpm_reg;
               //电机失能后,清零速度，后续和利时来改
@@ -115,7 +111,6 @@ void Analysis_Receive_From_Monitor(u8 data,MODBUS_SAMPLE* pMODBUS, MONITOR_STATU
               if(index & 0x1) st[index].real_rpm = -st[index].real_rpm;   //奇数电机速度反向
               st[index].real_mms = (s16)roundf((float)st[index].real_rpm * COFF_RPM_TO_MMS);
               st[index].counter += 1;
-#endif
             }
           }    
           else	  

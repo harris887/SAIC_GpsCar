@@ -9,12 +9,17 @@
 #define MOTO_COMM_PORT_ENUM             5   // 使用 USART5 发送 
 #define MOTO_CONTROL_CYCLE              12  // 20ms 的RS485通信周期 - 10 , 12 ,100
 #define DEFAULT_MOTO_READ_RPM_TIME_OUT  100
+#define DEFAULT_MOTO_CHECK_MAX_CURRENT_TIMEOUT 50 
+#define CHECK_MAX_CURRENT_HOLD_TIME            500
 u16 MOTO_485COMM_Timeout = 2000;
+u16 MOTO_CheckMaxCurrent_Timeout = 2000;
 s16 moto_speed_in_rpm[MOTO_NUM] = {0 ,0 ,0 ,0}; 
 u8 moto_enable_status[MOTO_NUM] = {0 ,0 ,0 ,0};
 u8 moto_enable_status_change_flag[MOTO_NUM] = {0 ,0 ,0 ,0};
 u16 MOTO_READ_RPM_Timeout[MOTO_NUM] = {DEFAULT_MOTO_READ_RPM_TIME_OUT ,DEFAULT_MOTO_READ_RPM_TIME_OUT ,DEFAULT_MOTO_READ_RPM_TIME_OUT ,DEFAULT_MOTO_READ_RPM_TIME_OUT};
 u8 moto_reset_speed_up_down_time_flag[MOTO_NUM] = {0 ,0 ,0 ,0};
+u8 moto_reset_max_current_flag[MOTO_NUM] = {0 ,0 ,0 ,0};
+u16 Moto_MaxCurrent[MOTO_NUM] = {MAX_MOTO_EA_THRESHOLD_0, MAX_MOTO_EA_THRESHOLD_0, MAX_MOTO_EA_THRESHOLD_0, MAX_MOTO_EA_THRESHOLD_0};
 #define MOTO_SPEED_UP_DOWN_DELAY_TIME     20  // 100 -> 20
 const u8 MODBUS_MOTO_ENBALE[8] =
 {0x01 ,0x06 ,0x00 ,0x38 ,0x00 ,0x01 ,0xC9 ,0xC7};
@@ -29,11 +34,9 @@ const u8 MODBUS_MOTO_DOWN_TIME_SET[8] =
 {0x01 ,0x06 ,0x00 ,0x31 ,0x00 ,0x64 ,0x00 ,0x00};
 const u8 MODBUS_MOTO_RPM_READ[8] = 
 //{0x01 ,0x03 ,0x10 ,0x2D ,0x00 ,0x01 ,0x85, 0xF6}; // 单位：0.01RPM
-#if (READ_RPM_RATE_1000)
-{0x01 ,0x03 ,0x10 ,0x02 ,0x00 ,0x01 ,0x85, 0xF6};   // 转矩率
-#else
 {0x01 ,0x03 ,0x10 ,0x00 ,0x00 ,0x01 ,0x85, 0xF6};   // 单位：RPM
-#endif
+const u8 MODBUS_MOTO_MAX_EA_SET[8] =
+{0x01 ,0x06 ,0x00 ,0x1A ,0x13 ,0x88 ,0xA5 ,0x5B};
 
 u8 moto_comm_buff[256];
 u32 ReadMotoRpmTimes[MOTO_NUM] = {0 ,0 ,0 ,0};
@@ -226,6 +229,20 @@ void SetMotoSpeedDownTime(u8 moto_enum, u16 time)
   FillUartTxBufN(moto_comm_buff,sizeof(MODBUS_MOTO_DOWN_TIME_SET),MOTO_COMM_PORT_ENUM);
 }
 
+void SetMotoMaxCurrent(u8 moto_enum, u16 max_curr)
+{
+  u16 cal_crc;
+  memcpy(moto_comm_buff, MODBUS_MOTO_MAX_EA_SET, sizeof(MODBUS_MOTO_MAX_EA_SET));
+  moto_comm_buff[0] = moto_enum + 1;
+  moto_comm_buff[4] = max_curr >> 8;
+  moto_comm_buff[5] = max_curr & 0xFF;
+  
+  cal_crc = ModBus_CRC16_Calculate(moto_comm_buff , 6);
+  moto_comm_buff[6] = cal_crc & 0xFF;
+  moto_comm_buff[7] = cal_crc >> 8;
+  FillUartTxBufN(moto_comm_buff, sizeof(MODBUS_MOTO_MAX_EA_SET), MOTO_COMM_PORT_ENUM);
+}
+
 //向电机驱动器发送指令，控制电机的转速，单位: RPM
 /*
 void SetMotoRpm(u8 moto_enum,s16 rpm)
@@ -315,6 +332,11 @@ void MOTO_SPEED_CONTROL_TASK(void)
               Enable_Moto_RS485(moto_enum, moto_enable_status[moto_enum]);            
             }
             break;
+          case 3:
+            {
+              SetMotoMaxCurrent(moto_enum, Moto_MaxCurrent[moto_enum]);
+            }
+            break;            
           default: ;
           }
           MOTO_485COMM_Timeout = MOTO_CONTROL_CYCLE;
@@ -324,7 +346,7 @@ void MOTO_SPEED_CONTROL_TASK(void)
         {
           moto_enum = 0;
           InitIndex += 1;
-          if(InitIndex >= 3) pro += 1;
+          if(InitIndex >= 4) pro += 1;
         }
       }
     }
@@ -464,12 +486,34 @@ void MOTO_SPEED_CONTROL_TASK(void)
         else
         {
           moto_enum = 0;
-          pro = 2;
+          pro += 1;
         }        
       }
     }
     break;    
-  case 7://useless
+  case 7: // set max current
+    {
+      if(MOTO_485COMM_Timeout == 0)
+      {
+        if(moto_enum < MOTO_NUM)
+        {
+            if(moto_reset_max_current_flag[moto_enum] != 0)
+            {
+              moto_reset_max_current_flag[moto_enum] = 0;
+              MOTO_485COMM_Timeout = MOTO_CONTROL_CYCLE;
+              SetMotoMaxCurrent(moto_enum, MOTO_SPEED_UP_DOWN_DELAY_TIME);
+            }
+            moto_enum += 1;
+        }
+        else
+        {
+          moto_enum = 0;
+          pro = 2;
+        }        
+      }
+    }
+    break;
+  case 8://useless
     {
       static u8 IM_STOP_Flag[MOTO_NUM]={0 ,0 ,0 ,0};
       static u8 IM_STOP_Status[MOTO_NUM]={0 ,0 ,0 ,0};
@@ -528,5 +572,77 @@ void MOTO_SPEED_CONTROL_TASK(void)
         }
       }
     }
+  }
+  
+#define DEFAULT_MOTO_CHECK_MAX_CURRENT_TIMEOUT 50 
+#define CHECK_MAX_CURRENT_HOLD_TIME            500
+  //-- 最大电流设定 --//
+  if(MOTO_CheckMaxCurrent_Timeout == 0)
+  {
+    static s32 dir_time = 0;
+    s32 abs_left_rpm, abs_right_rpm, abs_max_rpm, diff_rpm_rate, dir;
+    MOTO_CheckMaxCurrent_Timeout = DEFAULT_MOTO_CHECK_MAX_CURRENT_TIMEOUT; 
+    abs_left_rpm = abs_32(moto_speed_in_rpm[LEFT_MOTO_INDEX]);
+    abs_right_rpm = abs_32(moto_speed_in_rpm[RIGHT_MOTO_INDEX]);
+    abs_max_rpm = (abs_left_rpm > abs_right_rpm) ? abs_left_rpm : abs_right_rpm;
+    dir = abs_left_rpm - abs_right_rpm;
+    diff_rpm_rate = abs_32(abs_left_rpm - abs_right_rpm) * 100 / abs_max_rpm;
+    
+    if((abs_max_rpm > 100) && (diff_rpm_rate >= 5)) // rpm > 100 , diff_rate > 5%
+    {
+      if(dir < 0) 
+      {
+        if(dir_time > -CHECK_MAX_CURRENT_HOLD_TIME) 
+          dir_time += -DEFAULT_MOTO_CHECK_MAX_CURRENT_TIMEOUT;     
+      }
+      else 
+      {
+        if(dir_time < CHECK_MAX_CURRENT_HOLD_TIME) 
+          dir_time += DEFAULT_MOTO_CHECK_MAX_CURRENT_TIMEOUT;     
+      }
+    }
+    else
+    {
+      if(dir_time <= -DEFAULT_MOTO_CHECK_MAX_CURRENT_TIMEOUT) 
+        dir_time += DEFAULT_MOTO_CHECK_MAX_CURRENT_TIMEOUT;
+      else if(dir_time >= DEFAULT_MOTO_CHECK_MAX_CURRENT_TIMEOUT) 
+        dir_time -= DEFAULT_MOTO_CHECK_MAX_CURRENT_TIMEOUT;
+      else dir_time = 0;
+    }
+    
+    if((dir_time <= -CHECK_MAX_CURRENT_HOLD_TIME) 
+       && (Moto_MaxCurrent[LEFT_MOTO_INDEX] != MAX_MOTO_EA_THRESHOLD_1))
+    {
+      moto_reset_max_current_flag[LEFT_MOTO_INDEX] = 1;
+      moto_reset_max_current_flag[LEFT_2_MOTO_INDEX] = 1;
+      Moto_MaxCurrent[LEFT_MOTO_INDEX] = MAX_MOTO_EA_THRESHOLD_1;
+      Moto_MaxCurrent[LEFT_2_MOTO_INDEX] = MAX_MOTO_EA_THRESHOLD_1;
+    }
+    if((dir_time >= CHECK_MAX_CURRENT_HOLD_TIME) 
+       && (Moto_MaxCurrent[RIGHT_MOTO_INDEX] != MAX_MOTO_EA_THRESHOLD_1))
+    {
+      moto_reset_max_current_flag[RIGHT_MOTO_INDEX] = 1;
+      moto_reset_max_current_flag[RIGHT_2_MOTO_INDEX] = 1;
+      Moto_MaxCurrent[RIGHT_MOTO_INDEX] = MAX_MOTO_EA_THRESHOLD_1;
+      Moto_MaxCurrent[RIGHT_2_MOTO_INDEX] = MAX_MOTO_EA_THRESHOLD_1;
+    }
+    
+    if((dir_time == 0)
+       && (Moto_MaxCurrent[LEFT_MOTO_INDEX] != MAX_MOTO_EA_THRESHOLD_0))
+    {
+      moto_reset_max_current_flag[LEFT_MOTO_INDEX] = 1;
+      moto_reset_max_current_flag[LEFT_2_MOTO_INDEX] = 1;
+      Moto_MaxCurrent[LEFT_MOTO_INDEX] = MAX_MOTO_EA_THRESHOLD_0;
+      Moto_MaxCurrent[LEFT_2_MOTO_INDEX] = MAX_MOTO_EA_THRESHOLD_0;
+    }
+    
+    if((dir_time == 0)
+       && (Moto_MaxCurrent[RIGHT_MOTO_INDEX] != MAX_MOTO_EA_THRESHOLD_0))
+    {
+      moto_reset_max_current_flag[RIGHT_MOTO_INDEX] = 1;
+      moto_reset_max_current_flag[RIGHT_2_MOTO_INDEX] = 1;
+      Moto_MaxCurrent[RIGHT_MOTO_INDEX] = MAX_MOTO_EA_THRESHOLD_0;
+      Moto_MaxCurrent[RIGHT_2_MOTO_INDEX] = MAX_MOTO_EA_THRESHOLD_0;
+    }    
   }
 }
