@@ -22,8 +22,8 @@ extern float max_wheel_speed;
 #define SPEED_DOWN_RATIO              4.0        //电机齿轮箱减速比
 #define MAX_REMOTE_SPEED_IN_D1RPM     600        // 遥控器控制时最高限制转速
 
-#define MAX_MOTO_EA_THRESHOLD_0       2500  // 25A
-#define MAX_MOTO_EA_THRESHOLD_1       1500  // 15A
+#define MAX_MOTO_EA_THRESHOLD_0       3500  // 25A
+#define MAX_MOTO_EA_THRESHOLD_1       1000  // 15A
 
 //高电平使能，低电平去除falut
 #define LEFT_MOTO_EN_PIN    GPIO_Pin_3
@@ -190,4 +190,9 @@ extern u32 ReadMotoRpmTimes[MOTO_NUM];
 extern u8 moto_enable_status[MOTO_NUM];
 extern u16 MOTO_CheckMaxCurrent_Timeout;
 void ResetMotoSpeedUpDownTime(void);
+
+extern u32 Left_A_TO_1000;
+extern u32 Left_A_TO_3500;
+extern u32 RIGHT_A_TO_1000;
+extern u32 RIGHT_A_TO_3500;
 #endif

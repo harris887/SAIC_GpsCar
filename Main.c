@@ -170,6 +170,16 @@ int main(void)
       
       if(1)// µç»ú²âÊÔ
       {
+        if(USART_BYTE == 'Q')   
+        {
+          sprintf(test_buffer,"Left_A_TO_1000_3500 = [%d %d], RIGHT_A_TO_1000_3500 = [%d %d]\n",
+                  Left_A_TO_1000,
+                  Left_A_TO_3500,
+                  RIGHT_A_TO_1000,
+                  RIGHT_A_TO_3500);
+          FillUartTxBufN((u8*)test_buffer,strlen(test_buffer),1);        
+        }
+        
         if(USART_BYTE == 'A')
         {
           sprintf(test_buffer,"Speed_mmps: [ %d %d %d %d ], L_001rpm: [ %d %d %d %d ] \n",
