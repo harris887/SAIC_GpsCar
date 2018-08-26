@@ -340,6 +340,7 @@ void MOTO_SPEED_CONTROL_TASK(void)
           case 3: // useless
             {
               SetMotoMaxCurrent(moto_enum, Moto_MaxCurrent[moto_enum]);
+              printf("useless_0\n");
             }
             break;            
           default: ;
@@ -507,6 +508,7 @@ void MOTO_SPEED_CONTROL_TASK(void)
               moto_reset_max_current_flag[moto_enum] = 0;
               MOTO_485COMM_Timeout = MOTO_CONTROL_CYCLE;
               SetMotoMaxCurrent(moto_enum, Moto_MaxCurrent[moto_enum]);
+              printf("useless_1\n");
             }
             moto_enum += 1;
         }

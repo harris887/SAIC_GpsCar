@@ -71,6 +71,13 @@ int main(void)
       {
         static s16 speed = 0;
         static s8 o_index = 0;
+        
+        if(USART_BYTE == 'K')
+        {
+          sprintf(test_buffer,"LSP = %d, RSP = %d\n", moto_speed_in_rpm[LEFT_MOTO_INDEX], moto_speed_in_rpm[RIGHT_MOTO_INDEX]);
+          FillUartTxBufN((u8*)test_buffer, strlen(test_buffer), 1);
+        }            
+ 
         if(USART_BYTE == 'y')
         {
           USART_BYTE = 0;
@@ -221,11 +228,7 @@ int main(void)
       }
       if(1)
       {
-        if(USART_BYTE == 'K')
-        {
-          sprintf(test_buffer,"IMU_Angle = %d\n", IMU_Angle);
-          FillUartTxBufN((u8*)test_buffer, strlen(test_buffer), 1);
-        }    
+
         
         if(USART_BYTE == 'E')
         {
