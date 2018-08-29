@@ -156,6 +156,7 @@ void CacluteRemoteSpeed(s16* pWheelSpeedStep)
   }
   else
   {
+    diff = 0;
     left_right_dir = 0;
   }  
   
