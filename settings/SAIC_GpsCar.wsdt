@@ -2,44 +2,41 @@
 
 <Workspace>
   <ConfigDictionary>
-    <CurrentConfigs>
-      <Project>SAIC_GpsCar/Debug</Project>
-    </CurrentConfigs>
-  </ConfigDictionary>
+    
+  <CurrentConfigs><Project>SAIC_GpsCar/Debug</Project></CurrentConfigs></ConfigDictionary>
   <Desktop>
     <Static>
       <Workspace>
         <ColumnWidths>
-          <Column0>124</Column0>
-          <Column1>27</Column1>
-          <Column2>27</Column2>
-          <Column3>27</Column3>
-        </ColumnWidths>
+          
+          
+          
+          
+        <Column0>216</Column0><Column1>27</Column1><Column2>27</Column2><Column3>27</Column3></ColumnWidths>
       </Workspace>
       <Build>
-        <ColumnWidth0>20</ColumnWidth0>
-        <ColumnWidth1>1107</ColumnWidth1>
-        <ColumnWidth2>295</ColumnWidth2>
-        <ColumnWidth3>73</ColumnWidth3>
-      </Build>
-    </Static>
+        
+        
+        
+        
+      <ColumnWidth0>20</ColumnWidth0><ColumnWidth1>1107</ColumnWidth1><ColumnWidth2>295</ColumnWidth2><ColumnWidth3>73</ColumnWidth3></Build>
+    <Find-in-Files><ColumnWidth0>529</ColumnWidth0><ColumnWidth1>75</ColumnWidth1><ColumnWidth2>908</ColumnWidth2></Find-in-Files></Static>
     <Windows>
-      <Wnd0>
+      
+      
+    <Wnd2>
         <Tabs>
           <Tab>
             <Identity>TabID-3566-12840</Identity>
             <TabName>Workspace</TabName>
             <Factory>Workspace</Factory>
             <Session>
-              <NodeDict>
-                <ExpandedNode>SAIC_GpsCar</ExpandedNode>
-              </NodeDict>
-            </Session>
+              
+            <NodeDict><ExpandedNode>SAIC_GpsCar</ExpandedNode><ExpandedNode>SAIC_GpsCar/user</ExpandedNode></NodeDict></Session>
           </Tab>
         </Tabs>
-        <SelectedTab>0</SelectedTab>
-      </Wnd0>
-      <Wnd1>
+        
+      <SelectedTab>0</SelectedTab></Wnd2><Wnd3>
         <Tabs>
           <Tab>
             <Identity>TabID-3044-12850</Identity>
@@ -47,84 +44,22 @@
             <Factory>Build</Factory>
             <Session/>
           </Tab>
-        </Tabs>
-        <SelectedTab>0</SelectedTab>
-      </Wnd1>
-    </Windows>
+        <Tab><Identity>TabID-5758-19222</Identity><TabName>Find in Files</TabName><Factory>Find-in-Files</Factory><Session/></Tab></Tabs>
+        
+      <SelectedTab>0</SelectedTab></Wnd3></Windows>
     <Editor>
-      <Pane/>
-      <ActivePane>0</ActivePane>
-      <Sizes>
-        <Pane>
-          <X>1000000</X>
-          <Y>1000000</Y>
-        </Pane>
-      </Sizes>
-      <SplitMode>1</SplitMode>
-    </Editor>
+      
+      
+      
+      
+    <Pane><Tab><Factory>TextEditor</Factory><Filename>D:\study\&#x4e0A;&#x6D77;&#x6C7D;&#x8F66;\program\SAIC_GpsCar\User\ModBus_UserInterface.c</Filename><XPos>0</XPos><YPos>1277</YPos><SelStart>40456</SelStart><SelEnd>40456</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>D:\study\&#x4e0A;&#x6D77;&#x6C7D;&#x8F66;\program\SAIC_GpsCar\Main.c</Filename><XPos>0</XPos><YPos>143</YPos><SelStart>4474</SelStart><SelEnd>4485</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>D:\study\&#x4e0A;&#x6D77;&#x6C7D;&#x8F66;\program\SAIC_GpsCar\User\Program.c</Filename><XPos>0</XPos><YPos>194</YPos><SelStart>5641</SelStart><SelEnd>5641</SelEnd></Tab><ActiveTab>2</ActiveTab><Tab><Factory>TextEditor</Factory><Filename>D:\study\&#x4e0A;&#x6D77;&#x6C7D;&#x8F66;\program\SAIC_GpsCar\User\Usart.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>99</SelStart><SelEnd>99</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>D:\study\&#x4e0A;&#x6D77;&#x6C7D;&#x8F66;\program\SAIC_GpsCar\User\Program.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>409</SelStart><SelEnd>432</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>D:\study\&#x4e0A;&#x6D77;&#x6C7D;&#x8F66;\program\SAIC_GpsCar\User\moto_monitor.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>320</SelStart><SelEnd>337</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>D:\study\&#x4e0A;&#x6D77;&#x6C7D;&#x8F66;\program\SAIC_GpsCar\User\moto.c</Filename><XPos>0</XPos><YPos>67</YPos><SelStart>3400</SelStart><SelEnd>3400</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>D:\study\&#x4e0A;&#x6D77;&#x6C7D;&#x8F66;\program\SAIC_GpsCar\User\ModBus_UserInterface.h</Filename><XPos>0</XPos><YPos>66</YPos><SelStart>2080</SelStart><SelEnd>2080</SelEnd></Tab></Pane><ActivePane>0</ActivePane><Sizes><Pane><X>1000000</X><Y>1000000</Y></Pane></Sizes><SplitMode>1</SplitMode></Editor>
     <Positions>
-      <Top>
-        <Row0>
-          <Sizes>
-            <Toolbar-0451f558>
-              <key>iaridepm.enu1</key>
-            </Toolbar-0451f558>
-          </Sizes>
-        </Row0>
-      </Top>
-      <Left>
-        <Row0>
-          <Sizes>
-            <Wnd0>
-              <Rect>
-                <Top>-2</Top>
-                <Left>-2</Left>
-                <Bottom>538</Bottom>
-                <Right>198</Right>
-                <x>-2</x>
-                <y>-2</y>
-                <xscreen>200</xscreen>
-                <yscreen>200</yscreen>
-                <sizeHorzCX>130208</sizeHorzCX>
-                <sizeHorzCY>256082</sizeHorzCY>
-                <sizeVertCX>130208</sizeVertCX>
-                <sizeVertCY>691421</sizeVertCY>
-              </Rect>
-            </Wnd0>
-          </Sizes>
-        </Row0>
-      </Left>
-      <Right>
-        <Row0>
-          <Sizes/>
-        </Row0>
-      </Right>
-      <Bottom>
-        <Row0>
-          <Sizes>
-            <Wnd1>
-              <Rect>
-                <Top>-2</Top>
-                <Left>-2</Left>
-                <Bottom>198</Bottom>
-                <Right>1538</Right>
-                <x>-2</x>
-                <y>-2</y>
-                <xscreen>1540</xscreen>
-                <yscreen>200</yscreen>
-                <sizeHorzCX>1002604</sizeHorzCX>
-                <sizeHorzCY>256082</sizeHorzCY>
-                <sizeVertCX>130208</sizeVertCX>
-                <sizeVertCY>256082</sizeVertCY>
-              </Rect>
-            </Wnd1>
-          </Sizes>
-        </Row0>
-      </Bottom>
-      <Float>
-        <Sizes/>
-      </Float>
-    </Positions>
+      
+      
+      
+      
+      
+    <Top><Row0><Sizes><Toolbar-0452f5e0><key>iaridepm.enu1</key></Toolbar-0452f5e0></Sizes></Row0></Top><Left><Row0><Sizes><Wnd2><Rect><Top>-2</Top><Left>-2</Left><Bottom>538</Bottom><Right>307</Right><x>-2</x><y>-2</y><xscreen>200</xscreen><yscreen>200</yscreen><sizeHorzCX>130208</sizeHorzCX><sizeHorzCY>256082</sizeHorzCY><sizeVertCX>201172</sizeVertCX><sizeVertCY>691421</sizeVertCY></Rect></Wnd2></Sizes></Row0></Left><Right><Row0><Sizes/></Row0></Right><Bottom><Row0><Sizes><Wnd3><Rect><Top>-2</Top><Left>-2</Left><Bottom>198</Bottom><Right>1538</Right><x>-2</x><y>-2</y><xscreen>1540</xscreen><yscreen>200</yscreen><sizeHorzCX>1002604</sizeHorzCX><sizeHorzCY>256082</sizeHorzCY><sizeVertCX>130208</sizeVertCX><sizeVertCY>256082</sizeVertCY></Rect></Wnd3></Sizes></Row0></Bottom><Float><Sizes/></Float></Positions>
   </Desktop>
 </Workspace>
 

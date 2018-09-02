@@ -1355,7 +1355,8 @@ u8 AckModBusWriteMultiReg(u16 reg_addr,u16 reg_num,u8* pData)
       }
       
     }
-    break;    
+    break;
+/*    
   case 0x38:
     {//轮子速度控制
       if(reg_num==4)
@@ -1382,6 +1383,65 @@ u8 AckModBusWriteMultiReg(u16 reg_addr,u16 reg_num,u8* pData)
       else return_code=illegal_data;
     }
     break;
+*/
+  case 0x38:
+    {//轮子速度控制
+      if(reg_num==8)
+      {
+        u16 L_dir,R_dir,L_Speed,R_Speed;
+        u16 L2_dir,R2_dir,L2_Speed,R2_Speed;
+        L_dir=(((u16)pData[0])<<8)|(((u16)pData[1])<<0);
+        L_Speed=(((u16)pData[2])<<8)|(((u16)pData[3])<<0);
+        R_dir=(((u16)pData[4])<<8)|(((u16)pData[5])<<0);
+        R_Speed=(((u16)pData[6])<<8)|(((u16)pData[7])<<0);
+        
+        L2_dir=(((u16)pData[8])<<8)|(((u16)pData[9])<<0);
+        L2_Speed=(((u16)pData[10])<<8)|(((u16)pData[11])<<0);
+        R2_dir=(((u16)pData[12])<<8)|(((u16)pData[13])<<0);
+        R2_Speed=(((u16)pData[14])<<8)|(((u16)pData[15])<<0);        
+        if((L_dir<=1)&&(R_dir<=1)&&(L_Speed<=MAX_SPEED_IN_MMS)&&(L_Speed<=MAX_SPEED_IN_MMS)
+          && (L2_dir<=1)&&(R2_dir<=1)&&(L2_Speed<=MAX_SPEED_IN_MMS)&&(L2_Speed<=MAX_SPEED_IN_MMS) 
+           )
+        {
+          U_M_CONTROL_Op.M_CONTROL_OPTION.M_FreshFlag=1;
+          if(L_dir)
+          {
+            U_M_CONTROL_Op.M_CONTROL_OPTION.LeftSpeed=-L_Speed;
+          }
+          else
+          {
+            U_M_CONTROL_Op.M_CONTROL_OPTION.LeftSpeed=L_Speed;
+          }
+          if(R_dir)
+          {
+            U_M_CONTROL_Op.M_CONTROL_OPTION.RightSpeed=-R_Speed;
+          }
+          else        
+          {
+            U_M_CONTROL_Op.M_CONTROL_OPTION.RightSpeed=R_Speed;
+          }
+          if(L2_dir)
+          {
+            U_M_CONTROL_Op.M_CONTROL_OPTION.Left_2_Speed=-L2_Speed;
+          }
+          else
+          {
+            U_M_CONTROL_Op.M_CONTROL_OPTION.Left_2_Speed=L2_Speed;
+          }
+          if(R2_dir)
+          {
+            U_M_CONTROL_Op.M_CONTROL_OPTION.Right_2_Speed=-R2_Speed;
+          }
+          else        
+          {
+            U_M_CONTROL_Op.M_CONTROL_OPTION.Right_2_Speed=R2_Speed;
+          }          
+        }
+        else return_code=illegal_data;
+      }
+      else return_code=illegal_data;
+    }
+    break;    
   case 0x3C:
     {//设置-轮子位移总量
       if(reg_num==4)

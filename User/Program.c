@@ -2,7 +2,7 @@
 #include "string.h"
 #include "stdlib.h"
 
-#define PROGRAM_PRINTF_DEBUG          0
+#define PROGRAM_PRINTF_DEBUG          1
 
 #define DEFAULT_CHARGE_LONG_TIME_OUT  (10*3600*1000)  //10hours
 #define SYS_ON_Flag                   (1)
@@ -82,6 +82,14 @@ void AGV_RUN_Task(void)
 #if (PROGRAM_PRINTF_DEBUG)
           printf("IDLE\n");
 #endif
+          SET_DIDO_Relay(DIDO_BREAK_0, BREAK_OFF);
+          SET_DIDO_Relay(DIDO_BREAK_1, BREAK_OFF);
+          SET_DIDO_Relay(DIDO_BREAK_2, BREAK_OFF);
+          SET_DIDO_Relay(DIDO_BREAK_3, BREAK_OFF);
+          SET_DIDO_Relay(DIDO_MOTO_EN_0, DIDO_MOTO_ON);
+          SET_DIDO_Relay(DIDO_MOTO_EN_1, DIDO_MOTO_ON);
+          SET_DIDO_Relay(DIDO_MOTO_EN_2, DIDO_MOTO_ON);
+          SET_DIDO_Relay(DIDO_MOTO_EN_3, DIDO_MOTO_ON);          
           AGV_Delay=1000;
           MODE_BUS_HALL_Addr=DEFAULT_MODE_BUS_HALL_ADDR;
           ResetMotoSpeedUpDownTime();
