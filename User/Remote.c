@@ -349,7 +349,7 @@ void CHECK_REMOTE_ENABLE_TASK(void)
           SetBeep(3,100,200);
           
 #if (JOYSTICK_PRINTF_DEBUG)          
-          printf("REMOTE MODE! \n");
+          printf("REMOTE ON ! \n");
 #endif
         }
       }
@@ -375,7 +375,7 @@ void CHECK_REMOTE_ENABLE_TASK(void)
       SetBeep(1,300,200);
       
 #if (JOYSTICK_PRINTF_DEBUG)  
-      printf("SELF PROGRAM MODE! \n");
+      printf("REMOTE OFF ! \n");
 #endif
     }
   }

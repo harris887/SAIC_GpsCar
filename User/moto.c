@@ -428,7 +428,7 @@ void MOTO_SPEED_CONTROL_TASK(void)
             {
               SET_DIDO_Relay(moto_enum + DIDO_BREAK_0, moto_enable_status[moto_enum]? BREAK_OFF:BREAK_ON); 
             }
-            //SetBeep(1,1000,50);            
+          
           }
           moto_enum += 1;
         }

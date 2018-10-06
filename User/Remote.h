@@ -20,7 +20,7 @@ extern s16 RemoteRight;
 #define SPEED_GAIN_CHANNEL                    2
 #define REMOTE_OR_FOLLOWLINE_SELECT_CHANNEL   4
 #define REMOTE_ONCE_CYCLE_IN_MS               100
-#define REMOTE_SHAKE_TIME                     5
+#define REMOTE_SHAKE_TIME                     10 // 5
 
 #define REMOTE_PWM_SELECT_PORT      GPIOD
 #define REMOTE_PWM_SELECT_S0_PIN    GPIO_Pin_3

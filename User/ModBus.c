@@ -244,7 +244,7 @@ void MODBUS_READ_SERSOR_BOARD_TASK(void)
     
     if(SENSOR_STATUS_New.black_sensor_serial_flag==0)
     {
-      //SetBeep(1,200,100);//·¢³ö¾¯¸æ
+
     }
     if(ON_LINE_Flag)
     {

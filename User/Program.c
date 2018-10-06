@@ -80,7 +80,7 @@ void AGV_RUN_Task(void)
         if(AGV_Delay==0)
         {
 #if (PROGRAM_PRINTF_DEBUG)
-          printf("IDLE\n");
+          printf("--  IDLE MODE --\n");
 #endif
           SET_DIDO_Relay(DIDO_MOTO_EN_0, DIDO_MOTO_ON);
           SET_DIDO_Relay(DIDO_MOTO_EN_1, DIDO_MOTO_ON);
@@ -200,7 +200,7 @@ void AGV_RUN_Task(void)
       if(AGV_RUN_SUB_Pro==0)
       {
 #if (PROGRAM_PRINTF_DEBUG)
-        printf("REMOTE MODE\n");
+        printf("-- REMOTE MODE --\n");
 #endif
         AGV_Delay = 1000;
         SET_DIDO_Relay(DIDO_BREAK_0, BREAK_OFF);
@@ -244,6 +244,7 @@ void AGV_RUN_Task(void)
         //(b)进入空闲模式
         if(REMOTE_SelectFlag==0)
         {
+          MOTO_IM_STOP();
           SET_DIDO_Relay(DIDO_BREAK_0, BREAK_ON);
           SET_DIDO_Relay(DIDO_BREAK_1, BREAK_ON);
           SET_DIDO_Relay(DIDO_BREAK_2, BREAK_ON);
@@ -265,7 +266,7 @@ void AGV_RUN_Task(void)
       if(AGV_RUN_SUB_Pro==0)
       {
 #if (PROGRAM_PRINTF_DEBUG)
-        printf("LOW POWER\n");
+        printf("-- LOW POWER MODE --\n");
 #endif
         MOTO_IM_STOP();
         AGV_Delay=10000;
@@ -334,7 +335,7 @@ void AGV_RUN_Task(void)
       if(AGV_RUN_SUB_Pro==0)
       {
 #if (PROGRAM_PRINTF_DEBUG)
-        printf("BARRIER\n");
+        printf("-- BARRIER MODE --\n");
 #endif
         SetBeep(3,200,500);
         MOTO_IM_STOP();
@@ -392,9 +393,8 @@ void AGV_RUN_Task(void)
       if(AGV_RUN_SUB_Pro==0)
       {
 #if (PROGRAM_PRINTF_DEBUG)
-        printf("SOFT IM STOP\n");
+        printf("-- SOFT IM STOP MODE--\n");
 #endif
-        //SetBeep(1,1000,200);
         MOTO_IM_STOP();
         LED_DISPLAY_Reset();
         MONITOR_STATUS_Init();
@@ -408,7 +408,6 @@ void AGV_RUN_Task(void)
         //(a)急停按钮松开，进入空闲模式
         if(Software_IM_STOP==0)
         {
-          //SetBeep(3,300,500);
           AGV_Delay=500;
           LED_DISPLAY_Reset();
           AGV_RUN_Pro=AGV_STATUS_IDLE;
@@ -431,7 +430,7 @@ void AGV_RUN_Task(void)
       if(AGV_RUN_SUB_Pro==0)
       {
 #if (PROGRAM_PRINTF_DEBUG)
-        printf("IM STOP\n");
+        printf("-- IM STOP MODE --\n");
 #endif
         SetBeep(1,1000,200);
         MOTO_IM_STOP();
@@ -471,7 +470,7 @@ void AGV_RUN_Task(void)
       if(AGV_RUN_SUB_Pro==0)
       {
 #if (PROGRAM_PRINTF_DEBUG)
-        printf("USER PROGRAM\n");
+        printf("-- USER PROGRAM MODE --\n");
 #endif
         AGV_Delay=5000;
         MODE_BUS_HALL_Addr=DEFAULT_MODE_BUS_HALL_ADDR;        
@@ -1018,7 +1017,7 @@ void BATT_LOW_LEVEL_1_Warning(void)
     if(counter>=600000)//10分钟
     {
       counter=0;
-      SetBeep(5,300,700);//响5声
+      //SetBeep(5,300,700);//响5声
     }
   }
   else

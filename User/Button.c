@@ -75,7 +75,7 @@ void CHECK_BUTTON_TASK(void)
           BUTTON_Op[i].ButtonStatusChangFlag=1;
           BUTTON_Op[i].HoldTime=0;
           BUTTON_Op[i].ButtonPro=1;
-          //SetBeep(2,200,500);
+
 #if (BUTTON_PRINTF_DEBUG)
           printf("%d ON \n",i);
 #endif
@@ -99,7 +99,7 @@ void CHECK_BUTTON_TASK(void)
           BUTTON_Op[i].ButtonStatusChangFlag=1;
           BUTTON_Op[i].HoldTime=0;
           BUTTON_Op[i].ButtonPro=0;
-          //SetBeep(1,500,500);
+
 #if (BUTTON_PRINTF_DEBUG)
           printf("%d OFF \n",i);
 #endif
