@@ -945,7 +945,6 @@ u8 AckModBusWriteOneReg(u16 reg_addr,u16 reg_value)
     {//¿ØÖÆÑÛ¾¦
       if(reg_value<=1)
       {
-        //SET_DIDO_Relay(DIDO_LED_Eye, reg_value);
         return_code=return_OK;
       }
       else
@@ -1119,13 +1118,7 @@ u8 AckModBusWriteOneReg(u16 reg_addr,u16 reg_value)
   case 0x90:
     {//¿ØÖÆµÆ´ø
       if(reg_value<=0x7)
-      {
-        //if(reg_value&0x1) SET_DIDO_Relay(DIDO_LED_Red,1);
-        //else SET_DIDO_Relay(DIDO_LED_Red,0);
-        //if(reg_value&0x2) SET_DIDO_Relay(DIDO_LED_Green,1);
-        //else SET_DIDO_Relay(DIDO_LED_Green,0);
-        //if(reg_value&0x4) SET_DIDO_Relay(DIDO_LED_Blue,1);
-        //else SET_DIDO_Relay(DIDO_LED_Blue,0);        
+      {       
         return_code=return_OK;
       }
       else
@@ -1138,7 +1131,6 @@ u8 AckModBusWriteOneReg(u16 reg_addr,u16 reg_value)
     {//¿ØÖÆÑÛ¾¦
       if(reg_value<=1)
       {
-        //SET_DIDO_Relay(DIDO_LED_Eye, reg_value);
         return_code=return_OK;
       }
       else
@@ -1151,7 +1143,6 @@ u8 AckModBusWriteOneReg(u16 reg_addr,u16 reg_value)
     {//¿ØÖÆ·çÉÈ
       if(reg_value<=1)
       {
-        //SET_DIDO_Relay(DIDO_Fan, reg_value);
         return_code=return_OK;
       }
       else
@@ -1164,7 +1155,6 @@ u8 AckModBusWriteOneReg(u16 reg_addr,u16 reg_value)
     {//¿ØÖÆ·äÃùÆ÷
       if(reg_value<=1)
       {
-        SET_DIDO_Relay(DIDO_Buzzer, reg_value);
         return_code=return_OK;
       }
       else
@@ -1176,7 +1166,6 @@ u8 AckModBusWriteOneReg(u16 reg_addr,u16 reg_value)
     {//¿ØÖÆºôÎüµÆ
       if(reg_value<=1)
       {
-        //SET_DIDO_Relay(DIDO_Breath, reg_value);
         return_code=return_OK;
       }
       else

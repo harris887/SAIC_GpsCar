@@ -243,7 +243,7 @@ void PrintBmsInfor(void)
   printf("Valid     : %d  \r\n", BMS_St.Valid);  
   printf("Num       : %d  \r\n", master_read_num); 
   printf("---------------------------\r\n");
-  if(1)
+  if(0)
   {
     u8 i;
     printf("BMS_RX_Bytes:\r\n");

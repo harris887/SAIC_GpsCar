@@ -82,10 +82,6 @@ void AGV_RUN_Task(void)
 #if (PROGRAM_PRINTF_DEBUG)
           printf("IDLE\n");
 #endif
-          SET_DIDO_Relay(DIDO_BREAK_0, BREAK_OFF);
-          SET_DIDO_Relay(DIDO_BREAK_1, BREAK_OFF);
-          SET_DIDO_Relay(DIDO_BREAK_2, BREAK_OFF);
-          SET_DIDO_Relay(DIDO_BREAK_3, BREAK_OFF);
           SET_DIDO_Relay(DIDO_MOTO_EN_0, DIDO_MOTO_ON);
           SET_DIDO_Relay(DIDO_MOTO_EN_1, DIDO_MOTO_ON);
           SET_DIDO_Relay(DIDO_MOTO_EN_2, DIDO_MOTO_ON);
@@ -211,10 +207,6 @@ void AGV_RUN_Task(void)
         SET_DIDO_Relay(DIDO_BREAK_1, BREAK_OFF);
         SET_DIDO_Relay(DIDO_BREAK_2, BREAK_OFF);
         SET_DIDO_Relay(DIDO_BREAK_3, BREAK_OFF);
-        SET_DIDO_Relay(DIDO_MOTO_EN_0, DIDO_MOTO_ON);
-        SET_DIDO_Relay(DIDO_MOTO_EN_1, DIDO_MOTO_ON);
-        SET_DIDO_Relay(DIDO_MOTO_EN_2, DIDO_MOTO_ON);
-        SET_DIDO_Relay(DIDO_MOTO_EN_3, DIDO_MOTO_ON);
         
         
         LED_DISPLAY_Reset();
@@ -252,6 +244,10 @@ void AGV_RUN_Task(void)
         //(b)进入空闲模式
         if(REMOTE_SelectFlag==0)
         {
+          SET_DIDO_Relay(DIDO_BREAK_0, BREAK_ON);
+          SET_DIDO_Relay(DIDO_BREAK_1, BREAK_ON);
+          SET_DIDO_Relay(DIDO_BREAK_2, BREAK_ON);
+          SET_DIDO_Relay(DIDO_BREAK_3, BREAK_ON);          
           AGV_Delay=1500;
           LED_DISPLAY_Reset();
           AGV_RUN_Pro=AGV_STATUS_IDLE;

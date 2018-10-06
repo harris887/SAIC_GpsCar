@@ -1,7 +1,7 @@
 #include "user_inc.h"
 #include "string.h"
 
-#define JOYSTICK_PRINTF_DEBUG                 0
+#define JOYSTICK_PRINTF_DEBUG                 1
 
 
 

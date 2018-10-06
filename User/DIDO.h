@@ -24,10 +24,10 @@ typedef struct
 
 typedef enum
 {
-  DIDO_Buzzer = 0,
-  DIDO_LIGHT,
-  DIDO_Reserve_0,
+  DIDO_Reserve_0 = 0,
   DIDO_Reserve_1,
+  DIDO_Reserve_2,
+  DIDO_Reserve_3,
   
   DIDO_BREAK_0,
   DIDO_BREAK_1,

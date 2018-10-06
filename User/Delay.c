@@ -29,14 +29,14 @@ void SysTick_IrqHandler(void)
     if(Uart3RxTime!=0) Uart3RxTime--;
     if(Uart4RxTime!=0) Uart4RxTime--;
     if(Uart5RxTime!=0) Uart5RxTime--;
-    //if(Modebus_tx_rx_change_delay!=0) Modebus_tx_rx_change_delay--;
+
     if(modebus_timeout!=0) modebus_timeout--;
     if(Modebus_tx_rx_change_delay!=0) Modebus_tx_rx_change_delay--;
     if(RecoverFlash_Timeout!=0) RecoverFlash_Timeout--;
     if(MOTO_RS485_RX_TX_Timeout!=0) MOTO_RS485_RX_TX_Timeout--;
     if(REMOTE_SINGLE_CHANNAL_Timtout!=0) REMOTE_SINGLE_CHANNAL_Timtout--;
     if(REMOTE_CHANNAL_CHANGE_Delay!=0) REMOTE_CHANNAL_CHANGE_Delay--;
-    //if(BatteryVoltSampleTimeOut!=0) BatteryVoltSampleTimeOut--;
+
     if(AD_CHECK_TimeOut!=0) AD_CHECK_TimeOut--;
     if(AGV_Delay!=0) AGV_Delay--;
     if(ChargeLongTimeout!=0) ChargeLongTimeout--;
@@ -45,7 +45,7 @@ void SysTick_IrqHandler(void)
     if(ProgramControlCycle) ProgramControlCycle--;
     if(DIDO_COMM_Timeout) DIDO_COMM_Timeout--;
     if(DIDO_READ_LIGHT_Timeout) DIDO_READ_LIGHT_Timeout--;
-    //if(DIDO_ENABLE_Timeout) DIDO_ENABLE_Timeout--;
+
     if(MOTO_485COMM_Timeout) MOTO_485COMM_Timeout--;
     if(MOTO_READ_RPM_Timeout[LEFT_MOTO_INDEX]) MOTO_READ_RPM_Timeout[LEFT_MOTO_INDEX]--;
     if(MOTO_READ_RPM_Timeout[RIGHT_MOTO_INDEX]) MOTO_READ_RPM_Timeout[RIGHT_MOTO_INDEX]--;
@@ -68,7 +68,7 @@ void SysTick_IrqHandler(void)
     ADC_SoftwareStartConvCmd(ADC1, ENABLE);
     
     Timer_debug++;
-    if(Timer_debug>=1000)//2000 3000 200 50 1000
+    if(Timer_debug >= 1000)//2000 3000 200 50 1000
     {
         Timer_debug=0;
         debug_show=1;

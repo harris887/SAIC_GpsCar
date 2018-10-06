@@ -211,26 +211,10 @@ void Analysis_Receive_From_Dido(u8 data,MODBUS_SAMPLE* pMODBUS, void* stt)
 
 void Check_DIDO_TASK(void)
 {
-  /*
-  // 启动DIDO的电源
-  if(DIDO_ENABLE_Timeout==0)
-  {
-    static u8 DIDO_Enable = 0;
-    if(DIDO_Enable==0)
-    {
-      DIDO_Enable = 1;
-      Relay_status |= 0x20;
-      //SetRelay(RELAY_SPOWER_Index, RELAY_ON); //RELAY_ON RELAY_OFF
-    }
-  }
-  */
-  
   // 通讯
   if(DIDO_COMM_Timeout==0)
   {
-    /**/
     //输入光耦查询
-    //if(0)
     if(DIDO_READ_LIGHT_Timeout==0)
     {
       DIDO_COMM_Timeout = DEFAULT_DIDO_COMM_TIME_OUT;
@@ -263,7 +247,7 @@ void Check_DIDO_TASK(void)
           t_buf[sizeof(DEFAULT_DIDO_RELAY_SET)-1] = cal_crc>>8;
           FillUartTxBuf_NEx(t_buf,sizeof(DEFAULT_DIDO_RELAY_SET),DIDO_D_UART_PORT);
           
-          break;
+          return;
         }
       }
       
@@ -286,7 +270,7 @@ void Check_DIDO_TASK(void)
           t_buf[sizeof(DEFAULT_DIDO_RELAY_SET)-1] = cal_crc>>8;
           FillUartTxBuf_NEx(t_buf, sizeof(DEFAULT_DIDO_RELAY_SET), DIDO_A_UART_PORT);
           
-          break;
+          return;
         }
       }      
     }

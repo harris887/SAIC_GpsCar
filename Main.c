@@ -70,7 +70,7 @@ int main(void)
       if(1)
       {
         static s16 speed = 0;
-        static s8 o_index = 0;
+        //static s8 o_index = 0;
         
         if(USART_BYTE == 'K')
         {
@@ -78,22 +78,6 @@ int main(void)
           FillUartTxBufN((u8*)test_buffer, strlen(test_buffer), 1);
         }            
  
-        if(USART_BYTE == 'y')
-        {
-          USART_BYTE = 0;
-          printf("DIDO %d Off\n", o_index);
-          SET_DIDO_Relay(o_index--, 0);
-          if(o_index < 0) o_index = 11;
-          else if(o_index > 11) o_index = 0;
-        }        
-        if(USART_BYTE == 'Y')
-        {
-          USART_BYTE = 0;
-          printf("DIDO %d On\n", o_index);
-          SET_DIDO_Relay(o_index++, 1);
-          if(o_index < 0) o_index = 11;
-          else if(o_index > 11) o_index = 0;          
-        }
         if(USART_BYTE == 'Z')
         {
           //USART_BYTE = 0;
@@ -111,10 +95,13 @@ int main(void)
         if(USART_BYTE == 'S')
         {
           u8* bb = (u8*)&BMS_St;
-          printf("BMS %d: RSOC %04X, MF %04X, |%02X, %02X, %02X, %02X\n", MODBUS_Bms.read_success_num, 
+          printf("BMS %d: RSOC %04X, MF %04X, |%02X, %02X, %02X, %02X,{%d, %d, %d}\n", MODBUS_Bms.read_success_num, 
                  BMS_St.RSOC, 
                  BMS_St.ManufactureAccess,
-                 bb[0], bb[1], bb[2], bb[3]
+                 bb[0], bb[1], bb[2], bb[3],
+                 BMS_St.FCC, 
+                 BMS_St.RC, 
+                 BMS_St.CycleCount
                  );
         }          
         

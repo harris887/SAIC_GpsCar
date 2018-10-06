@@ -334,7 +334,8 @@ void MOTO_SPEED_CONTROL_TASK(void)
           case 2:
             {
               moto_enable_status[moto_enum] =0;
-              Enable_Moto_RS485(moto_enum, moto_enable_status[moto_enum]);            
+              Enable_Moto_RS485(moto_enum, moto_enable_status[moto_enum]);   
+              SET_DIDO_Relay(moto_enum + DIDO_BREAK_0, moto_enable_status[moto_enum]? BREAK_OFF:BREAK_ON);   
             }
             break;
           case 3: // useless
@@ -391,6 +392,10 @@ void MOTO_SPEED_CONTROL_TASK(void)
               MOTO_485COMM_Timeout = MOTO_CONTROL_CYCLE;
               moto_enable_status[moto_enum] = 1;
               Enable_Moto_RS485(moto_enum, moto_enable_status[moto_enum]);
+              if(AGV_RUN_Pro != AGV_STATUS_REMOTE)
+              {
+                SET_DIDO_Relay(moto_enum + DIDO_BREAK_0, moto_enable_status[moto_enum]? BREAK_OFF:BREAK_ON); 
+              }
               break;
             }
             MOTO_485COMM_Timeout = MOTO_CONTROL_CYCLE;
@@ -419,6 +424,10 @@ void MOTO_SPEED_CONTROL_TASK(void)
             MOTO_485COMM_Timeout = MOTO_CONTROL_CYCLE;
             moto_enable_status_change_flag[moto_enum] = 0;
             Enable_Moto_RS485(moto_enum, moto_enable_status[moto_enum]);
+            if(AGV_RUN_Pro != AGV_STATUS_REMOTE)
+            {
+              SET_DIDO_Relay(moto_enum + DIDO_BREAK_0, moto_enable_status[moto_enum]? BREAK_OFF:BREAK_ON); 
+            }
             //SetBeep(1,1000,50);            
           }
           moto_enum += 1;
@@ -568,8 +577,7 @@ void MOTO_SPEED_CONTROL_TASK(void)
               moto_enable_status[i] = 0;
               
               moto_enable_status_change_flag[i] = 1;
-              //Enable_Moto_RS485(i,moto_enable_status[i]);
-              //SetBeep(1,1000,50);
+
             }
           }
         }
