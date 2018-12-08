@@ -71,7 +71,7 @@ void Analysis_Receive_From_Monitor(u8 data,MODBUS_SAMPLE* pMODBUS, MONITOR_STATU
         if(pMODBUS->read_receive_timer == 1 )
         {
           pMODBUS->Read_Register_Num = pMODBUS->DataBuf[pMODBUS->BufIndex-1];
-          if(pMODBUS->Read_Register_Num <= 16)//长度限定
+          if(pMODBUS->Read_Register_Num <= 64)//长度限定, 16 -> 64
           {
             pMODBUS->MachineState = 0x03;
           }
@@ -103,7 +103,20 @@ void Analysis_Receive_From_Monitor(u8 data,MODBUS_SAMPLE* pMODBUS, MONITOR_STATU
             if((index>=MIN_MONITOR_DEV_ADDR)&&(index<=MAX_MONITOR_DEV_ADDR))
             {
               index -= MIN_MONITOR_DEV_ADDR;
-              *((u16*)(&(st[index].real_rpm_reg))) = (pMODBUS->DataBuf[3]<<8) | pMODBUS->DataBuf[4];
+              if(pMODBUS->Read_Register_Num == 2)
+              {
+                *((u16*)(&(st[index].real_rpm_reg))) = (pMODBUS->DataBuf[3]<<8) | pMODBUS->DataBuf[4];
+              }
+              else if(pMODBUS->Read_Register_Num == 6)
+              {
+                *((u16*)(&(st[index].real_rpm_reg))) = (pMODBUS->DataBuf[3]<<8) | pMODBUS->DataBuf[4];
+                *((u16*)(&(st[index].real_load_rate))) = (pMODBUS->DataBuf[7]<<8) | pMODBUS->DataBuf[8];
+              }
+              else
+              {
+                *((u16*)(&(st[index].real_rpm_reg))) = (pMODBUS->DataBuf[3 + (0x1C * 2)]<<8) | pMODBUS->DataBuf[4 + (0x1C * 2)];
+                *((u16*)(&(st[index].real_load_rate))) = (pMODBUS->DataBuf[7]<<8) | pMODBUS->DataBuf[8];
+              }
               st[index].real_rpm = st[index].real_rpm_reg;
               //电机失能后,清零速度，后续和利时来改
               if(moto_enable_status[index]==0) st[index].real_rpm = 0;

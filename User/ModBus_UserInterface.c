@@ -619,6 +619,30 @@ u8 AckModBusReadReg(u16 reg_addr,u16 reg_num)
     FillUartTxBufN(Send_Data_A8_array,index,U_TX_INDEX);
     return 1;    
   }
+/*
+  else if((reg_addr==0x38)&&(reg_num==4))
+  {//读取轮子速度，负载率
+    u16 cal_crc;
+    u16 temp[4];
+    temp[0] = *(u16*)(&MONITOR_St[LEFT_MOTO_INDEX].real_mms);
+    temp[1] = *(u16*)(&MONITOR_St[RIGHT_MOTO_INDEX].real_mms);
+    temp[2] = *(u16*)(&MONITOR_St[LEFT_MOTO_INDEX].real_load_rate);
+    temp[3] = *(u16*)(&MONITOR_St[RIGHT_MOTO_INDEX].real_load_rate);
+    Send_Data_A8_array[index++]=MOD_BUS_Reg.SLAVE_ADDR;
+    Send_Data_A8_array[index++]=CMD_ModBus_Read;
+    Send_Data_A8_array[index++]=(reg_num<<1)>>8;//byte length ,MSB
+    Send_Data_A8_array[index++]=(reg_num<<1)&0xFF;//byte length ,LSB
+    for(loop=0;loop<reg_num;loop++)
+    {
+      Send_Data_A8_array[index++]=temp[loop]>>8;
+      Send_Data_A8_array[index++]=temp[loop]&0xff;      
+    }
+    cal_crc=ModBus_CRC16_Calculate(Send_Data_A8_array , index);
+    Send_Data_A8_array[index++]=cal_crc&0xFF;
+    Send_Data_A8_array[index++]=cal_crc>>8;
+    FillUartTxBufN(Send_Data_A8_array,index,U_TX_INDEX);
+    return 1;    
+  }  */
   else if((reg_addr==0x3C)&&(reg_num==4))
   {
     //读取轮子的累计位移
@@ -745,7 +769,7 @@ u8 AckModBusReadReg(u16 reg_addr,u16 reg_num)
     temp[4] = DIDO_A_INPUT_Status.Analog[2];
     temp[5] = DIDO_A_INPUT_Status.Analog[3];
 
-    temp[6] = (DIDO_RelayStatus >> 8) & 0xFF;
+    temp[6] = (DIDO_RelayStatus >> 8) & 0xFF;  
     
     Send_Data_A8_array[index++] = MOD_BUS_Reg.SLAVE_ADDR;
     Send_Data_A8_array[index++] = CMD_ModBus_Read;
@@ -762,6 +786,46 @@ u8 AckModBusReadReg(u16 reg_addr,u16 reg_num)
     FillUartTxBufN(Send_Data_A8_array,index,U_TX_INDEX);
     return 1;
   }
+  else if((reg_addr == 0xB0) && (reg_num == 12)) // 7 + 4 + 1 
+  { //读取 DAM0808_INPUT and DAM0808_OUTPUT and DAM0404_INPUT[4] and DAM0404_OUTPUT
+    u16 cal_crc;
+    u16 temp[7 + 4 + 1];
+    temp[0] = DIDO_D_INPUT_Status.LightStatus;
+    temp[1] = DIDO_RelayStatus & 0xFF;
+
+    temp[2] = DIDO_A_INPUT_Status.Analog[0];
+    temp[3] = DIDO_A_INPUT_Status.Analog[1];
+    temp[4] = DIDO_A_INPUT_Status.Analog[2];
+    temp[5] = DIDO_A_INPUT_Status.Analog[3];
+
+    temp[6] = (DIDO_RelayStatus >> 8) & 0xFF;
+    
+    temp[7] = *(u16*)(&MONITOR_St[LEFT_MOTO_INDEX].real_mms);
+    temp[8] = *(u16*)(&MONITOR_St[RIGHT_MOTO_INDEX].real_mms);
+    temp[9] = *(u16*)(&MONITOR_St[LEFT_MOTO_INDEX].real_load_rate);
+    temp[10] = *(u16*)(&MONITOR_St[RIGHT_MOTO_INDEX].real_load_rate);  
+    
+    temp[11] = (moto_speed_in_rpm[LEFT_MOTO_INDEX]? (1 << 0) : 0)
+               | (moto_speed_in_rpm[RIGHT_MOTO_INDEX]? (1 << 1) : 0)
+               | (moto_speed_in_rpm[LEFT_2_MOTO_INDEX]? (1 << 2) : 0)
+               | (moto_speed_in_rpm[RIGHT_2_MOTO_INDEX]? (1 << 3) : 0)                 
+               | (REMOTE_SelectFlag? (1 << 4) : 0);
+    
+    Send_Data_A8_array[index++] = MOD_BUS_Reg.SLAVE_ADDR;
+    Send_Data_A8_array[index++] = CMD_ModBus_Read;
+    Send_Data_A8_array[index++] = (reg_num<<1)>>8;//byte length ,MSB
+    Send_Data_A8_array[index++] = (reg_num<<1)&0xFF;//byte length ,LSB
+    for(loop = 0; loop < reg_num; loop++)
+    {
+      Send_Data_A8_array[index++] = temp[loop] >> 8;
+      Send_Data_A8_array[index++] = temp[loop] & 0xff;
+    }
+    cal_crc=ModBus_CRC16_Calculate(Send_Data_A8_array , index);
+    Send_Data_A8_array[index++]=cal_crc&0xFF;
+    Send_Data_A8_array[index++]=cal_crc>>8;
+    FillUartTxBufN(Send_Data_A8_array,index,U_TX_INDEX);
+    return 1;
+  }  
   else if((reg_addr == 0xC0) && (reg_num == 16))  
   {
     u16 cal_crc;

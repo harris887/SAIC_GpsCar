@@ -19,8 +19,9 @@ extern float max_wheel_speed;
 
 #define WHEEL_DIAMETER_IN_CM          (MOD_BUS_Reg.WHEEL_DIAMETER_IN_MM * 0.1) 
 #define MAX_MOTO_SPEED_IN_D1RPM       (MAX_MOTO_SPEED_IN_RPM * 1)  // 10 -> 1
-#define SPEED_DOWN_RATIO              4.0        //电机齿轮箱减速比
-#define MAX_REMOTE_SPEED_IN_D1RPM     600        // 遥控器控制时最高限制转速
+#define SPEED_DOWN_RATIO              5.0        //电机齿轮箱减速比, 4.0 -> 5.0
+#define MAX_REMOTE_SPEED_IN_D1RPM     800        // 遥控器控制时最高限制转速 600 -> 800
+#define DRIVER_SELECT                 0          // 0 - 前驱 ，1 - 后驱
 
 #define MAX_MOTO_EA_THRESHOLD_0       3500  // 25A
 #define MAX_MOTO_EA_THRESHOLD_1       1000  // 15A

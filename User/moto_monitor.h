@@ -7,8 +7,8 @@ typedef struct
 {
   s16 real_rpm;
   s16 real_mms;
-  s16 real_rpm_reg;//从驱动器读回来的值
-  s16 rev_3;
+  s16 real_rpm_reg;   // 从驱动器读回来的值
+  s16 real_load_rate; // 有效转矩率，千分比
   u32 counter;
 }MONITOR_STATUS;
 

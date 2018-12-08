@@ -176,11 +176,13 @@ int main(void)
         
         if(USART_BYTE == 'A')
         {
-          sprintf(test_buffer,"Speed_mmps: [ %d %d %d %d ], L_001rpm: [ %d %d %d %d ] \n",
+          sprintf(test_buffer,"Speed_mmps: [ %d %d %d %d ], L_001rpm: [ %d %d %d %d ], Load: [%d %d] \n",
                   MONITOR_St[LEFT_MOTO_INDEX].real_mms, MONITOR_St[RIGHT_MOTO_INDEX].real_mms,
                   MONITOR_St[LEFT_2_MOTO_INDEX].real_mms, MONITOR_St[RIGHT_2_MOTO_INDEX].real_mms,
                   MONITOR_St[LEFT_MOTO_INDEX].real_rpm_reg, MONITOR_St[RIGHT_MOTO_INDEX].real_rpm_reg,
-                  MONITOR_St[LEFT_2_MOTO_INDEX].real_rpm_reg, MONITOR_St[RIGHT_2_MOTO_INDEX].real_rpm_reg);
+                  MONITOR_St[LEFT_2_MOTO_INDEX].real_rpm_reg, MONITOR_St[RIGHT_2_MOTO_INDEX].real_rpm_reg,
+                  MONITOR_St[LEFT_MOTO_INDEX].real_load_rate, MONITOR_St[RIGHT_MOTO_INDEX].real_load_rate
+                  );
           FillUartTxBufN((u8*)test_buffer,strlen(test_buffer),1);
         }
         else if(USART_BYTE == 'B')

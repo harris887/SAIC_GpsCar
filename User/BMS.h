@@ -3,7 +3,7 @@
 
 
 #define DEFAULT_BMS_READ_START_DELAY  2000
-#define DEFAULT_BMS_READ_CYCLE        1000
+#define DEFAULT_BMS_READ_CYCLE        500 // 1000
 
 
 typedef struct

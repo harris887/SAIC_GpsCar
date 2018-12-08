@@ -274,6 +274,9 @@ void WK2124_TransTask(void)
     {
       if(MODBUS_Bms.MachineState)
       {
+        //printf("MODBUS_Bms Error = %d %d %d\n", MODBUS_Bms.MachineState, 
+        //       MODBUS_Bms.read_receive_timer,
+        //       MODBUS_Bms.Read_Register_Num);
         MODBUS_Bms.MachineState = 0;
       }
     }  

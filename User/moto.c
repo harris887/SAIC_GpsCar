@@ -35,7 +35,10 @@ const u8 MODBUS_MOTO_DOWN_TIME_SET[8] =
 {0x01 ,0x06 ,0x00 ,0x31 ,0x00 ,0x64 ,0x00 ,0x00};
 const u8 MODBUS_MOTO_RPM_READ[8] = 
 //{0x01 ,0x03 ,0x10 ,0x2D ,0x00 ,0x01 ,0x85, 0xF6}; // 单位：0.01RPM
-{0x01 ,0x03 ,0x10 ,0x00 ,0x00 ,0x01 ,0x85, 0xF6};   // 单位：RPM
+//{0x01 ,0x03 ,0x10 ,0x00 ,0x00 ,0x01 ,0x85, 0xF6};   // 单位：RPM
+{0x01 ,0x03 ,0x10 ,0x00 ,0x00 ,0x03 ,0x01, 0x0B};   // DN_00 ~ DN_02
+//{0x01 ,0x03 ,0x10 ,0x00 ,0x00 ,0x1D ,0x81, 0x03};   // DN_00 ~ DN_1C
+//{0x01 ,0x03 ,0x10 ,0x1C ,0x00 ,0x01 ,0x41, 0x0C};   // DN_1C
 const u8 MODBUS_MOTO_MAX_EA_SET[8] =
 {0x01 ,0x06 ,0x00 ,0x1A ,0x13 ,0x88 ,0xA5 ,0x5B};
 
@@ -94,6 +97,7 @@ void SetD1Rpm(MOTO_INDEX_ENUM MOTO_SELECT,s16 d1rpm)
   if(d1rpm > MAX_MOTO_SPEED_IN_D1RPM) d1rpm = MAX_MOTO_SPEED_IN_D1RPM;
   else if(d1rpm < -MAX_MOTO_SPEED_IN_D1RPM)  d1rpm = -MAX_MOTO_SPEED_IN_D1RPM;  
   
+#if (DRIVER_SELECT == 0) // 前驱
   if((MOTO_SELECT == LEFT_MOTO_INDEX) || (MOTO_SELECT == LEFT_2_MOTO_INDEX))
   {
     RealRpm[MOTO_SELECT] = d1rpm;
@@ -104,6 +108,18 @@ void SetD1Rpm(MOTO_INDEX_ENUM MOTO_SELECT,s16 d1rpm)
     RealRpm[MOTO_SELECT] = d1rpm;
     moto_speed_in_rpm[MOTO_SELECT] = -d1rpm;
   }  
+#else // 后驱
+  if((MOTO_SELECT == LEFT_MOTO_INDEX) || (MOTO_SELECT == LEFT_2_MOTO_INDEX))
+  {
+    RealRpm[MOTO_SELECT] = d1rpm;
+    moto_speed_in_rpm[MOTO_SELECT + 1] = -d1rpm;
+  }
+  else if((MOTO_SELECT == RIGHT_MOTO_INDEX) || (MOTO_SELECT == RIGHT_2_MOTO_INDEX))
+  {
+    RealRpm[MOTO_SELECT] = d1rpm;
+    moto_speed_in_rpm[MOTO_SELECT - 1] = d1rpm;
+  }  
+#endif
 }
 
 void MOTO_IM_STOP(void)

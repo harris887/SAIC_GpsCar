@@ -241,7 +241,8 @@ void PrintBmsInfor(void)
   printf("PackStatus: %04X\r\n", BMS_St.PackStatus);  
   printf("BatStatus : %04X\r\n", BMS_St.BatStatus); 
   printf("Valid     : %d  \r\n", BMS_St.Valid);  
-  printf("Num       : %d  \r\n", master_read_num); 
+  printf("SlaveNum  : %d  \r\n", BMS_St.Num);  
+  printf("MasterNum : %d  \r\n", master_read_num); 
   printf("---------------------------\r\n");
   if(0)
   {
